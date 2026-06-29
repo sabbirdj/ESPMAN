@@ -1,5 +1,9 @@
 #include "ESPMAN.h"
 
+#if __has_include("espman_config.h")
+#include "espman_config.h"
+#endif
+
 ESPManager* ESPManager::_instance = nullptr;
 
 ESPManager::ESPManager() {
@@ -9,14 +13,25 @@ ESPManager::ESPManager() {
     lastWifiCheck = 0;
     wsConnected = false;
     otaInProgress = false;
+    
+#ifdef ESPMAN_WIFI_SSID
+    _wifiSSID = ESPMAN_WIFI_SSID;
+    _wifiPassword = ESPMAN_WIFI_PASS;
+    _serverHost = ESPMAN_SERVER_HOST;
+    _deviceName = ESPMAN_DEVICE_NAME;
+    _firmwareVersion = ESPMAN_FIRMWARE_VER;
+#else
     _wifiSSID = "";
     _wifiPassword = "";
     _serverHost = "";
+    _deviceName = "ESP Device";
+    _firmwareVersion = "1.0.0";
+#endif
+
     _serverPort = 3004;
     _httpPort = 3000;
     _useSSL = false;
-    _deviceName = "ESP Device";
-    _firmwareVersion = "1.0.0";
+    
     for(int i=0; i<64; i++) {
         pinState[i] = false;
         pinModes[i] = "INPUT";

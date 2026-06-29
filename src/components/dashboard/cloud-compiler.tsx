@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import Editor from '@monaco-editor/react'
 import { Card } from '@/components/ui/card'
-import { Server, Code, TerminalSquare, Loader2, Save } from 'lucide-react'
+import { Terminal, Code, Settings, Play, Server, Wifi, TerminalSquare, Loader2, Save } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRouter } from 'navigation'
 
@@ -12,6 +12,12 @@ export function CloudCompiler() {
   const [name, setName] = useState('MyCustomFirmware')
   const [version, setVersion] = useState('1.0.0')
   const [chipType, setChipType] = useState('ESP32')
+  
+  // Hardware Config
+  const [wifiSsid, setWifiSsid] = useState('')
+  const [wifiPassword, setWifiPassword] = useState('')
+  const [serverHost, setServerHost] = useState('13.62.213.148')
+
   const [isCompiling, setIsCompiling] = useState(false)
   const [logs, setLogs] = useState<string[]>([])
   const terminalRef = useRef<HTMLDivElement>(null)
@@ -36,6 +42,10 @@ export function CloudCompiler() {
       toast.error('Name and version are required')
       return
     }
+    if (!wifiSsid || !wifiPassword) {
+      toast.error('Wi-Fi SSID and Password are required')
+      return
+    }
 
     setIsCompiling(true)
     setLogs(['Starting remote compilation on VPS...'])
@@ -44,7 +54,15 @@ export function CloudCompiler() {
       const response = await fetch('/api/compiler', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, name, version, chipType })
+        body: JSON.stringify({ 
+          code, 
+          name, 
+          version, 
+          chipType,
+          wifiSsid,
+          wifiPassword,
+          serverHost
+        })
       })
 
       if (!response.body) {
@@ -143,44 +161,85 @@ export function CloudCompiler() {
       {/* Sidebar Controls */}
       <div className="flex flex-col gap-6">
         <Card className="p-5 border-slate-200 dark:border-slate-800">
-          <h3 className="mb-4 text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <Server className="h-4 w-4 text-emerald-500" />
-            Build Configuration
-          </h3>
-          
           <div className="space-y-4">
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-slate-300">Target Chip</label>
-              <select
-                value={chipType}
-                onChange={(e) => setChipType(e.target.value)}
-                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900"
-              >
-                <option value="ESP32">ESP32</option>
-                <option value="ESP8266">ESP8266</option>
-              </select>
+            <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800 pb-2">
+              <Settings className="h-4 w-4" />
+              Settings
             </div>
 
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-slate-300">Firmware Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. SmartSwitch"
-                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900"
-              />
-            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-slate-500">Firmware Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                />
+              </div>
 
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-slate-300">Version</label>
-              <input
-                type="text"
-                value={version}
-                onChange={(e) => setVersion(e.target.value)}
-                placeholder="e.g. 1.0.0"
-                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900"
-              />
+              <div>
+                <label className="text-xs font-medium text-slate-500">Version</label>
+                <input
+                  type="text"
+                  value={version}
+                  onChange={(e) => setVersion(e.target.value)}
+                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-slate-500">Target Chip</label>
+                <select
+                  value={chipType}
+                  onChange={(e) => setChipType(e.target.value)}
+                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                >
+                  <option value="ESP32">ESP32</option>
+                  <option value="ESP8266">ESP8266</option>
+                </select>
+              </div>
+
+              <div className="pt-2">
+                <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800 pb-2 mb-3">
+                  <Wifi className="h-4 w-4" />
+                  Hardware Config
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-xs font-medium text-slate-500">Wi-Fi SSID</label>
+                    <input
+                      type="text"
+                      placeholder="MyNetwork"
+                      value={wifiSsid}
+                      onChange={(e) => setWifiSsid(e.target.value)}
+                      className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-slate-500">Wi-Fi Password</label>
+                    <input
+                      type="text"
+                      placeholder="secret123"
+                      value={wifiPassword}
+                      onChange={(e) => setWifiPassword(e.target.value)}
+                      className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-slate-500">Server Host IP</label>
+                    <input
+                      type="text"
+                      value={serverHost}
+                      onChange={(e) => setServerHost(e.target.value)}
+                      className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="pt-4">

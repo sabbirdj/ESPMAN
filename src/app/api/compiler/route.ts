@@ -31,7 +31,7 @@ function streamResponse(iterator: AsyncGenerator<string>) {
 }
 
 export async function POST(req: Request) {
-  const { code, name, version, chipType } = await req.json()
+  const { code, name, version, chipType, wifiSsid, wifiPassword, serverHost } = await req.json()
 
   if (!code || !name || !version || !chipType) {
     return NextResponse.json({ error: 'Missing parameters' }, { status: 400 })
@@ -47,6 +47,22 @@ export async function POST(req: Request) {
     await fs.mkdir(tmpDir, { recursive: true })
     
     try {
+      yield 'Generating hardware configuration...'
+      
+      const configHeader = `
+#ifndef ESPMAN_USER_CONFIG_H
+#define ESPMAN_USER_CONFIG_H
+
+#define ESPMAN_WIFI_SSID "${wifiSsid || ''}"
+#define ESPMAN_WIFI_PASS "${wifiPassword || ''}"
+#define ESPMAN_SERVER_HOST "${serverHost || '13.62.213.148'}"
+#define ESPMAN_DEVICE_NAME "${name}"
+#define ESPMAN_FIRMWARE_VER "${version}"
+
+#endif
+`
+      await fs.writeFile(path.join(tmpDir, 'espman_config.h'), configHeader)
+
       // 1. Process user code directly
       yield 'Processing firmware code...'
       
