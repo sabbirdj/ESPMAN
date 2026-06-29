@@ -35,7 +35,7 @@ export function FleetBreakdown() {
     <Card className="border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-950">
       <div className="flex items-center justify-between">
         <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
-          <Cpu className="h-4 w-4 text-emerald-500" />
+          <Cpu className="h-4 w-4 text-slate-600 dark:text-slate-400" />
           Fleet by Chip Type
         </h3>
         <span className="text-xs text-slate-500 dark:text-slate-400">{total} total</span>
@@ -76,10 +76,10 @@ export function FleetBreakdown() {
 
       {/* Status summary */}
       <div className="mt-5 grid grid-cols-4 gap-2 border-t border-slate-100 pt-4 dark:border-slate-800">
-        <StatusPill label="Online" value={devices.filter((d) => d.status === 'online').length} color="text-emerald-600" />
-        <StatusPill label="Updating" value={devices.filter((d) => d.status === 'updating').length} color="text-amber-600" />
+        <StatusPill label="Online" value={devices.filter((d) => d.status === 'online').length} color="text-slate-900 dark:text-slate-100" />
+        <StatusPill label="Updating" value={devices.filter((d) => d.status === 'updating').length} color="text-slate-700 dark:text-slate-300" />
         <StatusPill label="Offline" value={devices.filter((d) => d.status === 'offline').length} color="text-slate-500" />
-        <StatusPill label="Error" value={devices.filter((d) => d.status === 'error').length} color="text-rose-600" />
+        <StatusPill label="Error" value={devices.filter((d) => d.status === 'error').length} color="text-slate-600 dark:text-slate-400" />
       </div>
 
       {stats && (

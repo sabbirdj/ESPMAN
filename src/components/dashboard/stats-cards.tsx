@@ -37,32 +37,32 @@ export function StatsCards() {
       value: total,
       sub: `${online} online · ${updating} updating`,
       icon: Cpu,
-      color: 'emerald',
-      gradient: 'from-emerald-500 to-teal-600',
+      color: 'slate',
+      gradient: 'from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-400',
     },
     {
       label: 'Online Now',
       value: online,
       sub: total > 0 ? `${Math.round((online / total) * 100)}% of fleet` : '—',
       icon: Activity,
-      color: 'cyan',
-      gradient: 'from-cyan-500 to-blue-500',
+      color: 'slate',
+      gradient: 'from-slate-600 to-slate-800 dark:from-slate-300 dark:to-slate-500',
     },
     {
       label: 'Firmware Images',
       value: stats?.firmware.total ?? '—',
       sub: stats ? `${stats.firmware.totalInstalls} installs` : 'loading…',
       icon: HardDrive,
-      color: 'violet',
-      gradient: 'from-violet-500 to-fuchsia-500',
+      color: 'slate',
+      gradient: 'from-slate-500 to-slate-700 dark:from-slate-400 dark:to-slate-600',
     },
     {
       label: 'Avg Wi-Fi Signal',
       value: avgSignal ? `${avgSignal.pct}%` : '—',
       sub: avgSignal ? `${avgSignal.label} · ${Math.round(avgRssi / Math.max(1, rssiCount))} dBm` : 'no devices',
       icon: Wifi,
-      color: 'amber',
-      gradient: 'from-amber-500 to-orange-500',
+      color: 'slate',
+      gradient: 'from-slate-400 to-slate-600 dark:from-slate-500 dark:to-slate-700',
     },
   ]
 
@@ -96,13 +96,13 @@ export function StatsCards() {
       })}
 
       {error > 0 && (
-        <Card className="col-span-full flex items-center gap-3 border-amber-300 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/40">
-          <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+        <Card className="col-span-full flex items-center gap-3 border-slate-300 bg-slate-100 p-4 dark:border-slate-700 dark:bg-slate-800/40">
+          <AlertTriangle className="h-5 w-5 text-slate-600 dark:text-slate-400" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+            <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
               {error} device{error !== 1 ? 's' : ''} in error state
             </p>
-            <p className="text-xs text-amber-700 dark:text-amber-300">
+            <p className="text-xs text-slate-700 dark:text-slate-300">
               Check the activity log for details or attempt to reboot the affected devices.
             </p>
           </div>

@@ -65,7 +65,7 @@ export function FirmwareManager() {
             Upload firmware .bin files and install them onto your ESP devices over the air (OTA).
           </p>
         </div>
-        <Button onClick={() => setUploadOpen(true)} size="sm" className="bg-emerald-600 hover:bg-emerald-700">
+        <Button onClick={() => setUploadOpen(true)} size="sm" className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900">
           <Upload className="h-4 w-4" />
           Upload Firmware
         </Button>
@@ -210,14 +210,14 @@ function FirmwareCard({
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 text-slate-400 hover:text-emerald-500"
+              className="h-7 w-7 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
               onClick={() => window.open(`/api/firmware/${firmware.id}/bin`, '_blank')}
               title="Download .bin file"
             >
               <Download className="h-3.5 w-3.5" />
             </Button>
           )}
-          <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-rose-500" onClick={handleDelete} title="Delete firmware">
+          <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100" onClick={handleDelete} title="Delete firmware">
             <Trash2 className="h-3.5 w-3.5" />
           </Button>
         </div>
@@ -237,11 +237,11 @@ function FirmwareCard({
           {firmware.installCount} install{firmware.installCount !== 1 ? 's' : ''}
         </span>
         {firmware.hasBinary ? (
-          <Badge variant="outline" className="border-emerald-300 bg-emerald-50 px-1.5 py-0 text-[10px] text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+          <Badge variant="outline" className="border-slate-300 bg-slate-100 px-1.5 py-0 text-[10px] text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
             .bin ready
           </Badge>
         ) : (
-          <Badge variant="outline" className="border-amber-300 bg-amber-50 px-1.5 py-0 text-[10px] text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+          <Badge variant="outline" className="border-slate-400 bg-slate-200 px-1.5 py-0 text-[10px] text-slate-600 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-400">
             No .bin file
           </Badge>
         )}
@@ -269,14 +269,14 @@ function FirmwareCard({
             size="sm"
             onClick={handleInstall}
             disabled={installing || !targetDeviceId || compatible.length === 0 || !firmware.hasBinary}
-            className="h-8 bg-emerald-600 hover:bg-emerald-700"
+            className="h-8 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900"
           >
             <Plus className="h-3.5 w-3.5" />
             Install OTA
           </Button>
         </div>
         {!firmware.hasBinary && (
-          <p className="mt-2 text-[10px] text-amber-600 dark:text-amber-400">
+          <p className="mt-2 text-[10px] text-slate-600 dark:text-slate-400">
             ⚠️ No .bin file uploaded. Re-upload this firmware with a .bin file to enable OTA.
           </p>
         )}
@@ -389,16 +389,16 @@ function UploadFirmwareDialog({
             <Textarea id="fw-desc" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="What does this firmware do? What's new in this version?" rows={2} />
           </div>
           {file && (
-            <div className="flex items-center gap-2 rounded-lg bg-emerald-50 p-2 text-xs dark:bg-emerald-950/30">
-              <FileUp className="h-4 w-4 text-emerald-600" />
-              <span className="text-emerald-700 dark:text-emerald-300">
+            <div className="flex items-center gap-2 rounded-lg bg-slate-100 p-2 text-xs dark:bg-slate-800">
+              <FileUp className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+              <span className="text-slate-700 dark:text-slate-300">
                 {file.name} ({formatBytes(file.size)})
               </span>
             </div>
           )}
           <DialogFooter className="gap-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>Cancel</Button>
-            <Button type="submit" disabled={submitting} className="bg-emerald-600 hover:bg-emerald-700">
+            <Button type="submit" disabled={submitting} className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900">
               <Upload className="h-4 w-4" />
               {submitting ? 'Uploading…' : 'Upload'}
             </Button>

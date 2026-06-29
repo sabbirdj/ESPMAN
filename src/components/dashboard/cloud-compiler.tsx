@@ -233,7 +233,7 @@ export function CloudCompiler() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                 />
               </div>
 
@@ -243,7 +243,7 @@ export function CloudCompiler() {
                   type="text"
                   value={version}
                   onChange={(e) => setVersion(e.target.value)}
-                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                 />
               </div>
 
@@ -252,7 +252,7 @@ export function CloudCompiler() {
                 <select
                   value={chipType}
                   onChange={(e) => setChipType(e.target.value)}
-                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                 >
                   <option value="ESP32">ESP32</option>
                   <option value="ESP8266">ESP8266</option>
@@ -266,7 +266,7 @@ export function CloudCompiler() {
                   placeholder="e.g. DHT sensor library, Adafruit NeoPixel"
                   value={dependencies}
                   onChange={(e) => setDependencies(e.target.value)}
-                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                 />
                 <p className="mt-1 text-[10px] text-slate-500">Comma-separated exact library names.</p>
               </div>
@@ -280,7 +280,7 @@ export function CloudCompiler() {
                   
                   <Dialog open={isManageDialogOpen} onOpenChange={setIsManageDialogOpen}>
                     <DialogTrigger asChild>
-                      <button className="text-[10px] text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 font-medium bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded">
+                      <button className="text-[10px] text-slate-600 hover:text-slate-700 dark:text-slate-400 font-medium bg-slate-100 dark:bg-slate-800/30 px-2 py-1 rounded">
                         Manage Profiles
                       </button>
                     </DialogTrigger>
@@ -300,7 +300,7 @@ export function CloudCompiler() {
                                 placeholder="e.g. Home"
                                 value={newProfileName}
                                 onChange={e => setNewProfileName(e.target.value)}
-                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
                               />
                             </div>
                             <div>
@@ -310,7 +310,7 @@ export function CloudCompiler() {
                                 placeholder="Network name"
                                 value={newProfileSsid}
                                 onChange={e => setNewProfileSsid(e.target.value)}
-                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
                               />
                             </div>
                             <div>
@@ -320,11 +320,11 @@ export function CloudCompiler() {
                                 placeholder="Optional"
                                 value={newProfilePassword}
                                 onChange={e => setNewProfilePassword(e.target.value)}
-                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
                               />
                             </div>
                           </div>
-                          <Button onClick={handleSaveProfile} size="sm" className="w-full bg-indigo-600 hover:bg-indigo-700 mt-2">
+                          <Button onClick={handleSaveProfile} size="sm" className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900 mt-2">
                             <Plus className="h-4 w-4 mr-1" /> Save Profile
                           </Button>
                         </div>
@@ -353,7 +353,7 @@ export function CloudCompiler() {
                                   <Button 
                                     variant="ghost" 
                                     size="icon" 
-                                    className="h-7 w-7 text-slate-400 hover:text-rose-500"
+                                    className="h-7 w-7 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                                     onClick={() => handleDeleteProfile(p.id)}
                                   >
                                     <Trash2 className="h-3.5 w-3.5" />
@@ -379,7 +379,7 @@ export function CloudCompiler() {
                       <select
                         value={selectedProfileId}
                         onChange={(e) => handleProfileSelect(e.target.value)}
-                        className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                        className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                       >
                         <option value="">-- Custom Config --</option>
                         {profiles.map(p => (
@@ -396,7 +396,7 @@ export function CloudCompiler() {
                       placeholder="MyNetwork"
                       value={wifiSsid}
                       onChange={(e) => setWifiSsid(e.target.value)}
-                      className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                      className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                     />
                   </div>
 
@@ -407,7 +407,7 @@ export function CloudCompiler() {
                       placeholder="secret123"
                       value={wifiPassword}
                       onChange={(e) => setWifiPassword(e.target.value)}
-                      className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                      className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                     />
                   </div>
 
@@ -417,7 +417,7 @@ export function CloudCompiler() {
                       type="text"
                       value={serverHost}
                       onChange={(e) => setServerHost(e.target.value)}
-                      className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                      className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                     />
                   </div>
                 </div>
@@ -428,7 +428,7 @@ export function CloudCompiler() {
               <button
                 onClick={handleCompile}
                 disabled={isCompiling}
-                className="flex w-full items-center justify-center gap-2 rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex w-full items-center justify-center gap-2 rounded-md bg-slate-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isCompiling ? (
                   <>
@@ -444,7 +444,7 @@ export function CloudCompiler() {
               </button>
             </div>
             
-            <div className="mt-4 rounded-md bg-emerald-50 p-3 text-xs text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200 border border-emerald-100 dark:border-emerald-800">
+            <div className="mt-4 rounded-md bg-slate-100 p-3 text-xs text-slate-800 dark:bg-slate-800/30 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
               <p className="font-semibold mb-1">How it works:</p>
               <ul className="list-disc pl-4 space-y-1">
                 <li>Paste any standard Arduino sketch.</li>

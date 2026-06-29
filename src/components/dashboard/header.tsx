@@ -53,7 +53,7 @@ export function Header({
 
       {/* Live pill */}
       <div className="hidden items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 lg:flex dark:border-slate-800 dark:bg-slate-900">
-        <Activity className="h-3.5 w-3.5 text-emerald-500" />
+        <Activity className="h-3.5 w-3.5 text-slate-600 dark:text-slate-400" />
         <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
           {onlineCount} online{updatingCount > 0 ? ` · ${updatingCount} updating` : ''}
         </span>
@@ -69,7 +69,7 @@ export function Header({
           title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         >
           {theme === 'dark' ? (
-            <Sun className="h-4 w-4 text-amber-400" />
+            <Sun className="h-4 w-4 text-slate-400" />
           ) : (
             <Moon className="h-4 w-4 text-slate-600" />
           )}
@@ -79,12 +79,12 @@ export function Header({
       <Button variant="ghost" size="icon" className="relative">
         <Bell className="h-4 w-4" />
         {updatingCount > 0 && (
-          <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-slate-900 dark:bg-slate-100" />
         )}
       </Button>
 
       {showAddButton && onAddDevice && (
-        <Button onClick={onAddDevice} size="sm" className="bg-emerald-600 hover:bg-emerald-700">
+        <Button onClick={onAddDevice} size="sm" className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900">
           <Plus className="h-4 w-4" />
           <span className="hidden sm:inline">Add Device</span>
         </Button>

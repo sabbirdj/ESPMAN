@@ -28,10 +28,10 @@ interface DeviceCardProps {
 }
 
 const statusConfig: Record<string, { label: string; dot: string; text: string; bg: string; ring: string }> = {
-  online:   { label: 'Online',    dot: 'bg-emerald-500', text: 'text-emerald-700',   bg: 'bg-emerald-50',   ring: 'ring-emerald-200' },
+  online:   { label: 'Online',    dot: 'bg-slate-900 dark:bg-slate-100', text: 'text-slate-900 dark:text-slate-100',   bg: 'bg-slate-100 dark:bg-slate-800',   ring: 'ring-slate-300 dark:ring-slate-700' },
   offline:  { label: 'Offline',   dot: 'bg-slate-400',   text: 'text-slate-600',     bg: 'bg-slate-100',    ring: 'ring-slate-200' },
-  updating: { label: 'Updating',  dot: 'bg-amber-500',   text: 'text-amber-700',     bg: 'bg-amber-50',     ring: 'ring-amber-200' },
-  error:    { label: 'Error',     dot: 'bg-rose-500',    text: 'text-rose-700',      bg: 'bg-rose-50',      ring: 'ring-rose-200' },
+  updating: { label: 'Updating',  dot: 'bg-slate-500 dark:bg-slate-400',   text: 'text-slate-700 dark:text-slate-300',     bg: 'bg-slate-100 dark:bg-slate-800',     ring: 'ring-slate-300 dark:ring-slate-700' },
+  error:    { label: 'Error',     dot: 'bg-slate-600 dark:bg-slate-300',    text: 'text-slate-800 dark:text-slate-200',      bg: 'bg-slate-100 dark:bg-slate-800',      ring: 'ring-slate-300 dark:ring-slate-700' },
 }
 
 export function DeviceCard({ device, onSelect, onReboot }: DeviceCardProps) {
@@ -42,7 +42,7 @@ export function DeviceCard({ device, onSelect, onReboot }: DeviceCardProps) {
   const heapPct = device.heapUsed != null && device.heapTotal ? Math.round((device.heapUsed / device.heapTotal) * 100) : null
   const flashPct = device.flashUsed != null && device.flashTotal ? Math.round((device.flashUsed / device.flashTotal) * 100) : null
 
-  const tempColor = tempSev === 'hot' ? 'text-rose-600' : tempSev === 'warm' ? 'text-amber-600' : 'text-emerald-600'
+  const tempColor = tempSev === 'hot' ? 'text-slate-900 dark:text-slate-100' : tempSev === 'warm' ? 'text-slate-700 dark:text-slate-300' : 'text-slate-600 dark:text-slate-400'
 
   const isUpdating = device.status === 'updating'
   const isOffline = device.status === 'offline'
@@ -50,7 +50,7 @@ export function DeviceCard({ device, onSelect, onReboot }: DeviceCardProps) {
   return (
     <Card
       className={`group relative overflow-hidden border-slate-200 bg-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200/50 dark:border-slate-800 dark:bg-slate-950 dark:hover:shadow-black/40 ${
-        isUpdating ? 'ring-2 ring-amber-300' : ''
+        isUpdating ? 'ring-2 ring-slate-400 dark:ring-slate-600' : ''
       }`}
     >
       {/* Top accent strip — colored by device type */}
@@ -72,7 +72,7 @@ export function DeviceCard({ device, onSelect, onReboot }: DeviceCardProps) {
             <div className="min-w-0">
               <button
                 onClick={() => onSelect(device)}
-                className="block max-w-full truncate text-left text-sm font-semibold text-slate-900 hover:text-emerald-700 dark:text-slate-100 dark:hover:text-emerald-400"
+                className="block max-w-full truncate text-left text-sm font-semibold text-slate-900 hover:text-slate-700 dark:text-slate-100 dark:hover:text-slate-300"
                 title={device.name}
               >
                 {device.name}
@@ -82,7 +82,7 @@ export function DeviceCard({ device, onSelect, onReboot }: DeviceCardProps) {
                   {device.type}
                 </Badge>
                 {device.isReal && (
-                  <Badge variant="outline" className="gap-1 px-1.5 py-0 text-[10px] font-medium border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300" title="A real ESP is connected over WebSocket">
+                  <Badge variant="outline" className="gap-1 px-1.5 py-0 text-[10px] font-medium border-slate-300 bg-slate-100 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" title="A real ESP is connected over WebSocket">
                     <Usb className="h-2.5 w-2.5" />
                     Connected
                   </Badge>
@@ -123,15 +123,15 @@ export function DeviceCard({ device, onSelect, onReboot }: DeviceCardProps) {
 
         {/* Install progress bar */}
         {isUpdating && typeof device.installProgress === 'number' && (
-          <div className="mt-4 rounded-lg bg-amber-50 p-3 dark:bg-amber-950/30">
-            <div className="flex items-center justify-between text-xs font-medium text-amber-700 dark:text-amber-300">
+          <div className="mt-4 rounded-lg bg-slate-100 p-3 dark:bg-slate-800">
+            <div className="flex items-center justify-between text-xs font-medium text-slate-700 dark:text-slate-300">
               <span className="inline-flex items-center gap-1.5">
                 <Loader2 className="h-3 w-3 animate-spin" />
                 Installing firmware…
               </span>
               <span>{device.installProgress}%</span>
             </div>
-            <Progress value={device.installProgress} className="mt-2 h-1.5 bg-amber-200" />
+            <Progress value={device.installProgress} className="mt-2 h-1.5 bg-slate-200 dark:bg-slate-700" />
           </div>
         )}
 
@@ -149,7 +149,7 @@ export function DeviceCard({ device, onSelect, onReboot }: DeviceCardProps) {
               label="Wi-Fi"
               value={wifi ? `${wifi.pct}%` : '—'}
               sub={wifi ? wifi.label : undefined}
-              valueClass={wifi && wifi.pct > 60 ? 'text-emerald-600' : wifi && wifi.pct > 30 ? 'text-amber-600' : 'text-rose-600'}
+              valueClass={wifi && wifi.pct > 60 ? 'text-slate-600 dark:text-slate-400' : wifi && wifi.pct > 30 ? 'text-slate-700 dark:text-slate-300' : 'text-slate-900 dark:text-slate-100'}
             />
             <TelemetryTile
               icon={<Cpu className="h-3.5 w-3.5" />}
@@ -184,7 +184,7 @@ export function DeviceCard({ device, onSelect, onReboot }: DeviceCardProps) {
                   title={`GPIO ${pin}: ${on ? 'HIGH' : 'LOW'}`}
                   className={`inline-flex h-4 w-7 items-center justify-center rounded text-[9px] font-mono font-semibold ${
                     on
-                      ? 'bg-emerald-500 text-white'
+                      ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900'
                       : 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500'
                   }`}
                 >
@@ -211,7 +211,7 @@ export function DeviceCard({ device, onSelect, onReboot }: DeviceCardProps) {
             variant="ghost"
             size="sm"
             onClick={() => onSelect(device)}
-            className="ml-auto h-8 text-xs text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-950/40"
+            className="ml-auto h-8 text-xs text-slate-900 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-100 dark:hover:bg-slate-800"
           >
             Manage
             <ChevronRight className="h-3.5 w-3.5" />

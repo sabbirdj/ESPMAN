@@ -151,7 +151,7 @@ export default function Home() {
                     <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Recent Devices</h2>
                     <button
                       onClick={() => setView('devices')}
-                      className="text-xs font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400"
+                      className="text-xs font-medium text-slate-600 hover:text-slate-700 dark:text-slate-400"
                     >
                       View all →
                     </button>
@@ -206,13 +206,13 @@ export default function Home() {
 
           {view === 'logs' && (
             <div className="animate-fade-in space-y-4">
-              <Card className="flex items-center gap-3 border-slate-200 bg-emerald-50 p-4 dark:border-emerald-900 dark:bg-emerald-950/30">
-                <Radio className="h-5 w-5 text-emerald-500" />
+              <Card className="flex items-center gap-3 border-slate-200 bg-slate-100 p-4 dark:border-slate-700 dark:bg-slate-800/30">
+                <Radio className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                 <div>
-                  <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200">
+                  <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
                     Live event stream active
                   </p>
-                  <p className="text-xs text-emerald-700 dark:text-emerald-300">
+                  <p className="text-xs text-slate-600 dark:text-slate-400">
                     Events from the device-service arrive in real time. Older events are persisted in the database and loaded on first visit.
                   </p>
                 </div>

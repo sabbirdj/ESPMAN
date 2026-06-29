@@ -25,7 +25,7 @@ export function MobileNav({ activeView, onViewChange }: MobileNavProps) {
             key={item.id}
             onClick={() => onViewChange(item.id)}
             className={`flex flex-1 flex-col items-center gap-1 py-2.5 text-[10px] font-medium ${
-              active ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'
+              active ? 'text-slate-900 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400'
             }`}
           >
             <Icon className="h-4 w-4" />
