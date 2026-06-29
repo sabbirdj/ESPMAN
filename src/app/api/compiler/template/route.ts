@@ -6,12 +6,7 @@ export async function GET() {
 ESPManager manager;
 
 void setup() {
-  // 1. Configure your device
-  manager.setWiFi("YOUR_WIFI_SSID", "YOUR_WIFI_PASSWORD");
-  manager.setServer("13.62.213.148", 3004, 3000, false);
-  manager.setDevice("My Custom ESP", "1.0.0");
-  
-  // 2. Start ESPMAN core (connects to Wi-Fi and Server)
+  // Start ESPMAN core (automatically connects using settings from UI)
   manager.begin();
 
   // ==========================================
@@ -21,7 +16,7 @@ void setup() {
 }
 
 void loop() {
-  // 1. Process ESPMAN background tasks (OTA, WebSocket)
+  // Process ESPMAN background tasks (OTA, WebSocket)
   manager.loop();
 
   // ==========================================
