@@ -25,6 +25,8 @@ export function CloudCompiler() {
   const [selectedProfileId, setSelectedProfileId] = useState<string>('')
   const [isManageDialogOpen, setIsManageDialogOpen] = useState(false)
   const [newProfileName, setNewProfileName] = useState('')
+  const [newProfileSsid, setNewProfileSsid] = useState('')
+  const [newProfilePassword, setNewProfilePassword] = useState('')
 
   const [isCompiling, setIsCompiling] = useState(false)
   const [logs, setLogs] = useState<string[]>([])
@@ -51,16 +53,16 @@ export function CloudCompiler() {
   }, [logs])
 
   const handleSaveProfile = () => {
-    if (!newProfileName.trim()) {
-      toast.error('Profile name is required')
+    if (!newProfileName.trim() || !newProfileSsid.trim()) {
+      toast.error('Profile name and Wi-Fi SSID are required')
       return
     }
     
     const newProfile: WifiProfile = {
       id: Date.now().toString(),
       name: newProfileName.trim(),
-      ssid: wifiSsid,
-      password: wifiPassword,
+      ssid: newProfileSsid.trim(),
+      password: newProfilePassword,
       host: serverHost
     }
     
@@ -70,6 +72,8 @@ export function CloudCompiler() {
     localStorage.setItem('espman_wifi_profiles', JSON.stringify(updated))
     toast.success('Wi-Fi profile saved')
     setNewProfileName('')
+    setNewProfileSsid('')
+    setNewProfilePassword('')
   }
 
   const handleDeleteProfile = (id: string) => {
@@ -271,20 +275,43 @@ export function CloudCompiler() {
                         <DialogTitle>Wi-Fi Profiles</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4 py-2">
-                        {/* Add new profile */}
-                        <div className="flex gap-2 items-end">
-                          <div className="flex-1">
-                            <label className="text-xs font-medium text-slate-500">Profile Name</label>
-                            <input 
-                              type="text" 
-                              placeholder="e.g. Home"
-                              value={newProfileName}
-                              onChange={e => setNewProfileName(e.target.value)}
-                              className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
-                            />
+                        {/* Add new profile form */}
+                        <div className="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 space-y-3">
+                          <div className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Create New Profile</div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="col-span-2">
+                              <label className="text-xs font-medium text-slate-500">Profile Name</label>
+                              <input 
+                                type="text" 
+                                placeholder="e.g. Home"
+                                value={newProfileName}
+                                onChange={e => setNewProfileName(e.target.value)}
+                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-slate-500">Wi-Fi SSID</label>
+                              <input 
+                                type="text" 
+                                placeholder="Network name"
+                                value={newProfileSsid}
+                                onChange={e => setNewProfileSsid(e.target.value)}
+                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-slate-500">Password</label>
+                              <input 
+                                type="text" 
+                                placeholder="Optional"
+                                value={newProfilePassword}
+                                onChange={e => setNewProfilePassword(e.target.value)}
+                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                              />
+                            </div>
                           </div>
-                          <Button onClick={handleSaveProfile} size="sm" className="bg-indigo-600 hover:bg-indigo-700">
-                            <Plus className="h-4 w-4 mr-1" /> Add Current
+                          <Button onClick={handleSaveProfile} size="sm" className="w-full bg-indigo-600 hover:bg-indigo-700 mt-2">
+                            <Plus className="h-4 w-4 mr-1" /> Save Profile
                           </Button>
                         </div>
                         
