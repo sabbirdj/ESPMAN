@@ -521,6 +521,8 @@ function handleEspTelemetry(msg: any) {
   if (typeof msg.freeHeap === 'number' && device.heapTotal) {
     device.heapUsed = Math.max(0, device.heapTotal - msg.freeHeap)
   }
+  if (typeof msg.flashUsed === 'number') device.flashUsed = msg.flashUsed
+  if (typeof msg.flashTotal === 'number') device.flashTotal = msg.flashTotal
   if (typeof msg.wifiRssi === 'number') device.wifiRssi = msg.wifiRssi
   if (typeof msg.uptimeSeconds === 'number') device.uptimeSeconds = msg.uptimeSeconds
   if (msg.gpioState && typeof msg.gpioState === 'object') {
@@ -537,6 +539,8 @@ function handleEspTelemetry(msg: any) {
     id: device.id,
     cpuTemp: device.cpuTemp,
     heapUsed: device.heapUsed != null ? Math.floor(device.heapUsed) : null,
+    flashUsed: device.flashUsed,
+    flashTotal: device.flashTotal,
     wifiRssi: device.wifiRssi,
     uptimeSeconds: device.uptimeSeconds,
     lastSeenAt: device.lastSeenAt,

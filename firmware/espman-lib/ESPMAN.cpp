@@ -199,8 +199,12 @@ void ESPManager::sendTelemetry() {
   doc["ipAddress"]       = WiFi.localIP().toString();
 #ifdef ESP8266
   doc["freeHeap"]        = (uint32_t)ESP.getFreeHeap();
+  doc["flashUsed"]       = (uint32_t)ESP.getSketchSize();
+  doc["flashTotal"]      = (uint32_t)ESP.getFlashChipRealSize();
 #else
   doc["freeHeap"]        = (uint32_t)ESP.getFreeHeap();
+  doc["flashUsed"]       = (uint32_t)ESP.getSketchSize();
+  doc["flashTotal"]      = (uint32_t)ESP.getFlashChipSize();
 #endif
   doc["wifiRssi"]        = WiFi.RSSI();
   doc["uptimeSeconds"]   = (uint32_t)((millis() - bootTime) / 1000UL);
