@@ -21,6 +21,8 @@ export function CloudCompiler() {
   type WifiProfile = { id: string; name: string; ssid: string; password: string; host: string }
   const [profiles, setProfiles] = useState<WifiProfile[]>([])
   const [selectedProfileId, setSelectedProfileId] = useState<string>('')
+  const [isSavingProfile, setIsSavingProfile] = useState(false)
+  const [newProfileName, setNewProfileName] = useState('')
 
   const [isCompiling, setIsCompiling] = useState(false)
   const [logs, setLogs] = useState<string[]>([])
@@ -47,12 +49,14 @@ export function CloudCompiler() {
   }, [logs])
 
   const handleSaveProfile = () => {
-    const profileName = prompt('Enter a name for this Wi-Fi profile (e.g. Home, Office):')
-    if (!profileName) return
+    if (!newProfileName.trim()) {
+      toast.error('Profile name is required')
+      return
+    }
     
     const newProfile: WifiProfile = {
       id: Date.now().toString(),
-      name: profileName,
+      name: newProfileName.trim(),
       ssid: wifiSsid,
       password: wifiPassword,
       host: serverHost
@@ -63,6 +67,8 @@ export function CloudCompiler() {
     setSelectedProfileId(newProfile.id)
     localStorage.setItem('espman_wifi_profiles', JSON.stringify(updated))
     toast.success('Wi-Fi profile saved')
+    setIsSavingProfile(false)
+    setNewProfileName('')
   }
 
   const handleProfileSelect = (id: string) => {
@@ -245,10 +251,29 @@ export function CloudCompiler() {
                     <Wifi className="h-4 w-4" />
                     Hardware Config
                   </div>
-                  <button onClick={handleSaveProfile} className="text-[10px] text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 font-medium">
-                    + Save Profile
-                  </button>
+                  {!isSavingProfile && (
+                    <button onClick={() => setIsSavingProfile(true)} className="text-[10px] text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 font-medium">
+                      + Save Profile
+                    </button>
+                  )}
                 </div>
+
+                {isSavingProfile && (
+                  <div className="mb-3 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-md border border-slate-200 dark:border-slate-800 flex flex-col gap-2">
+                    <label className="text-xs font-medium text-slate-500">Profile Name</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. Home, Office"
+                      value={newProfileName}
+                      onChange={e => setNewProfileName(e.target.value)}
+                      className="w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                    />
+                    <div className="flex gap-2 justify-end mt-1">
+                      <button onClick={() => setIsSavingProfile(false)} className="text-xs text-slate-500 hover:text-slate-700">Cancel</button>
+                      <button onClick={handleSaveProfile} className="text-xs text-emerald-600 font-medium hover:text-emerald-700">Save</button>
+                    </div>
+                  </div>
+                )}
 
                 <div className="space-y-3">
                   {profiles.length > 0 && (
