@@ -18,10 +18,6 @@ export const metadata: Metadata = {
   title: "ESP Device Manager — Fleet Console",
   description: "Real-time web console for managing ESP8266/ESP32 devices: firmware install, reboot, GPIO control, telemetry.",
   keywords: ["ESP32", "ESP8266", "IoT", "device manager", "OTA firmware", "WebSocket"],
-  authors: [{ name: "Z.ai" }],
-  icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
-  },
 };
 
 export default function RootLayout({

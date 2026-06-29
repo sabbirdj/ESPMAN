@@ -88,11 +88,6 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
             <Wifi className="h-3 w-3" />
             <span>device-service · port 3003</span>
           </div>
-        </div>
-        <div className="mt-3 flex items-center gap-2 px-1 text-xs text-slate-400 dark:text-slate-500">
-          <Settings className="h-3 w-3" />
-          <span>v0.1.0 · Z.ai sandbox</span>
-        </div>
       </div>
     </aside>
   )
