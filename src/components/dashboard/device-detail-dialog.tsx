@@ -350,7 +350,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                               disabled={isUpdating || isOffline}
                               className="rounded bg-neutral-200 px-1.5 py-0.5 text-[9px] font-bold text-neutral-600 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
                             >
-                              {mode}
+                              {mode === 'INPUT_PULLUP' ? 'PULLUP' : mode}
                             </button>
 
                             {/* Value Toggle Button */}
