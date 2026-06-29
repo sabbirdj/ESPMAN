@@ -241,7 +241,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
             </button>
           </div>
 
-          <ScrollArea className="flex-1 px-6 min-h-0">
+          <div className="flex-1 overflow-y-auto px-6 min-h-0">
             <div className="space-y-5 py-5">
               {/* Telemetry Tab */}
               {activeTab === 'telemetry' && (
@@ -337,7 +337,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                           <div
                             key={pin}
                             className={`flex flex-col items-center gap-1.5 rounded-xl border-2 p-2.5 transition-all ${
-                              on
+                              isOutput && on
                                 ? 'border-neutral-900 bg-neutral-100 dark:border-neutral-200 dark:bg-neutral-800'
                                 : 'border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900'
                             }`}
@@ -359,10 +359,10 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                               disabled={isUpdating || isOffline || !isOutput}
                               className={`mt-1 flex w-full flex-col items-center gap-1 rounded-md py-1.5 ${!isOutput ? 'cursor-not-allowed opacity-70' : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
                             >
-                              <span className={`text-lg font-black ${on ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-400 dark:text-neutral-500'}`}>
-                                {on ? '1' : '0'}
+                              <span className={`text-lg font-black ${isOutput && on ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-400 dark:text-neutral-500'}`}>
+                                {isOutput ? (on ? '1' : '0') : '—'}
                               </span>
-                              <div className={`h-1.5 w-full rounded-full ${on ? 'bg-neutral-900 dark:bg-neutral-100' : 'bg-neutral-200 dark:bg-neutral-700'}`} />
+                              <div className={`h-1.5 w-full rounded-full ${isOutput && on ? 'bg-neutral-900 dark:bg-neutral-100' : 'bg-neutral-200 dark:bg-neutral-700'}`} />
                             </button>
                           </div>
                         )
@@ -458,7 +458,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                 </section>
               )}
             </div>
-          </ScrollArea>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
