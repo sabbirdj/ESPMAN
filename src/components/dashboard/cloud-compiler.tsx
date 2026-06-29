@@ -115,7 +115,7 @@ export function CloudCompiler() {
               Arduino Editor
             </div>
             <div className="text-xs text-slate-500">
-              ESPMAN C++ Library Included
+              ESPMAN framework is automatically injected during compilation
             </div>
           </div>
           <div className="h-[500px] w-full">
@@ -265,9 +265,9 @@ export function CloudCompiler() {
             <div className="mt-4 rounded-md bg-emerald-50 p-3 text-xs text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200 border border-emerald-100 dark:border-emerald-800">
               <p className="font-semibold mb-1">How it works:</p>
               <ul className="list-disc pl-4 space-y-1">
-                <li>Your custom code uses the ESPMAN library.</li>
-                <li>Set your custom config (Wi-Fi, Server) in setup().</li>
-                <li>The ESPMAN C++ files are compiled together automatically.</li>
+                <li>Paste any standard Arduino sketch.</li>
+                <li>Set your custom config (Wi-Fi, Server) in the Settings panel.</li>
+                <li>ESPMAN framework is automatically injected without duplicate code errors.</li>
                 <li>Deploy to any device instantly via OTA!</li>
               </ul>
             </div>

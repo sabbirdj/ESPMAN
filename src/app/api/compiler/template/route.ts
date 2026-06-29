@@ -1,28 +1,14 @@
 import { NextResponse } from 'next/server'
 
 export async function GET() {
-  const boilerplate = `#include "ESPMAN.h"
+  const boilerplate = `void setup() {
+  // Put your setup code here, to run once:
 
-ESPManager manager;
-
-void setup() {
-  // Start ESPMAN core (automatically connects using settings from UI)
-  manager.begin();
-
-  // ==========================================
-  // ADD YOUR CUSTOM SETUP LOGIC BELOW
-  // ==========================================
-  
 }
 
 void loop() {
-  // Process ESPMAN background tasks (OTA, WebSocket)
-  manager.loop();
+  // Put your main code here, to run repeatedly:
 
-  // ==========================================
-  // ADD YOUR CUSTOM LOOP LOGIC BELOW
-  // ==========================================
-  
 }
 `
 

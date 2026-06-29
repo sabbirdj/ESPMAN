@@ -66,9 +66,44 @@ export async function POST(req: Request) {
       // 1. Process user code directly
       yield 'Processing firmware code...'
       
+      let finalCode = code
+      
+      // Smart Injection: If user didn't include the library manually, inject it
+      if (!code.includes('ESPMAN.h')) {
+        yield 'Auto-injecting ESPMAN framework...'
+        
+        // Rename user's setup and loop
+        let userCode = code
+        userCode = userCode.replace(/\bvoid\s+setup\s*\(\s*\)/g, 'void user_setup()')
+        userCode = userCode.replace(/\bvoid\s+loop\s*\(\s*\)/g, 'void user_loop()')
+        
+        finalCode = `
+#include "ESPMAN.h"
+ESPManager espman_auto_manager;
+
+// ==========================================
+// USER CODE
+// ==========================================
+${userCode}
+
+// ==========================================
+// ESPMAN INJECTED WRAPPER
+// ==========================================
+void setup() {
+  espman_auto_manager.begin();
+  user_setup();
+}
+
+void loop() {
+  espman_auto_manager.loop();
+  user_loop();
+}
+`
+      }
+
       // Write user code to temp dir
       const sketchFile = path.join(tmpDir, `${path.basename(tmpDir)}.ino`)
-      await fs.writeFile(sketchFile, code)
+      await fs.writeFile(sketchFile, finalCode)
       
       // 2. Copy ESPMAN library into sketch folder
       yield 'Injecting ESPMAN Library...'
