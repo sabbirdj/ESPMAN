@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Device {
+  id              String   @id @default(cuid())
+  name            String
+  type            String   // ESP8266 | ESP32 | ESP32-S2 | ESP32-S3 | ESP32-C3 | ESP32-C6
+  macAddress      String   @unique
+  ipAddress       String?
+  firmwareId      String?
+  firmwareVersion String?
+  status          String   @default("offline") // online | offline | updating | error
+  location        String?
+  description     String?
+  // Telemetry (latest snapshot)
+  cpuTemp         Float?
+  heapUsed        Int?     // bytes
+  heapTotal       Int?     // bytes
+  flashUsed       Int?     // bytes
+  flashTotal      Int?     // bytes
+  wifiRssi        Int?     // dBm
+  uptimeSeconds   Int?     @default(0)
+  // GPIO state (JSON string of pin states: {"0":true,"2":false,...})
+  gpioState       String?
+  // Metadata
+  lastSeenAt      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  firmware        Firmware? @relation(fields: [firmwareId], references: [id], onDelete: SetNull)
+  telemetryLogs   TelemetryLog[]
+
+  @@index([status])
+  @@index([type])
+}
+
+model Firmware {
+  id          String   @id @default(cuid())
+  name        String
+  version     String
+  type        String   // which ESP type this firmware targets
+  size        Int      // bytes
+  checksum    String
+  description String?
+  // Track install count
+  installCount Int     @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  devices     Device[]
+}
+
+model TelemetryLog {
+  id        String   @id @default(cuid())
+  deviceId  String
+  event     String   // online | offline | reboot | command | firmware | error
+  message   String
+  level     String   @default("info") // info | warn | error | success
+  createdAt DateTime @default(now())
+
+  device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@index([deviceId])
+  @@index([createdAt])
+}

@@ -1,0 +1,481 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import {
+  AlertTriangle,
+  Cpu,
+  Hash,
+  Loader2,
+  MapPin,
+  Power,
+  RotateCcw,
+  RotateCw,
+  Send,
+  Signal,
+  Thermometer,
+  Trash2,
+  Wifi,
+  Clock,
+  MemoryStick,
+  HardDrive,
+  Usb,
+} from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
+import { toast } from 'sonner'
+import { ESP_TYPE_SPECS, formatBytes, formatUptime, tempSeverity, wifiSignalStrength, type EspType } from '@/lib/types'
+import { useDashboardStore, type DashboardDevice } from '@/lib/store'
+import { useDeviceSocketEmitter } from '@/hooks/use-device-socket'
+
+interface DeviceDetailDialogProps {
+  device: DashboardDevice | null
+  onOpenChange: (open: boolean) => void
+  onDeviceRemoved?: () => void
+}
+
+export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: DeviceDetailDialogProps) {
+  const emitter = useDeviceSocketEmitter()
+  const [command, setCommand] = useState('')
+  const [rebooting, setRebooting] = useState(false)
+  const [resetting, setResetting] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
+  if (!device) return null
+
+  const spec = ESP_TYPE_SPECS[device.type as EspType]
+  const wifi = device.wifiRssi != null ? wifiSignalStrength(device.wifiRssi) : null
+  const tempSev = device.cpuTemp != null ? tempSeverity(device.cpuTemp) : 'ok'
+  const heapPct = device.heapUsed != null && device.heapTotal ? Math.round((device.heapUsed / device.heapTotal) * 100) : null
+  const flashPct = device.flashUsed != null && device.flashTotal ? Math.round((device.flashUsed / device.flashTotal) * 100) : null
+
+  const isUpdating = device.status === 'updating'
+  const isOffline = device.status === 'offline'
+
+  const handleReboot = async () => {
+    if (!device) return
+    setRebooting(true)
+    try {
+      // 1. Tell API to log the command + mark device offline
+      await fetch(`/api/devices/${device.id}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'reboot' }),
+      })
+      // 2. Tell device-service to simulate the reboot
+      emitter.reboot(device.id)
+      toast.success(`Reboot sent to ${device.name}`)
+    } catch {
+      toast.error('Failed to send reboot')
+    } finally {
+      setRebooting(false)
+    }
+  }
+
+  const handleFactoryReset = async () => {
+    if (!device) return
+    if (!confirm(`Factory reset ${device.name}? This will erase its firmware and GPIO state.`)) return
+    setResetting(true)
+    try {
+      await fetch(`/api/devices/${device.id}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'factory-reset' }),
+      })
+      emitter.factoryReset(device.id)
+      toast.success(`Factory reset initiated on ${device.name}`)
+    } catch {
+      toast.error('Failed to factory reset')
+    } finally {
+      setResetting(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!device) return
+    if (!confirm(`Delete ${device.name}? This permanently removes it from your fleet.`)) return
+    setDeleting(true)
+    try {
+      const res = await fetch(`/api/devices/${device.id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Delete failed')
+      emitter.removeDevice(device.id)
+      toast.success(`${device.name} removed from fleet`)
+      onDeviceRemoved?.()
+      onOpenChange(false)
+    } catch {
+      toast.error('Failed to delete device')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const handleToggleGpio = (pin: number, current: boolean) => {
+    if (!device) return
+    emitter.toggleGpio(device.id, pin, !current)
+    // Log via API (best-effort)
+    fetch(`/api/devices/${device.id}/command`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'gpio', payload: { pin, value: !current } }),
+    }).catch(() => {})
+  }
+
+  const handleSendCommand = () => {
+    if (!device || !command.trim()) return
+    emitter.sendCommand(device.id, command.trim())
+    fetch(`/api/devices/${device.id}/command`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'serial', payload: { command: command.trim() } }),
+    }).catch(() => {})
+    toast.success(`Command sent: ${command.trim()}`)
+    setCommand('')
+  }
+
+  return (
+    <Dialog open={!!device} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-hidden p-0 sm:max-w-[780px]">
+        {/* Header banner */}
+        <div
+          className="h-2 w-full"
+          style={{ backgroundColor: spec?.color ?? '#10b981' }}
+        />
+        <div className="flex max-h-[88vh] flex-col overflow-hidden">
+          <DialogHeader className="px-6 pb-2 pt-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div
+                  className="flex h-12 w-12 items-center justify-center rounded-lg text-white shadow-sm"
+                  style={{ backgroundColor: spec?.color ?? '#10b981' }}
+                >
+                  <Cpu className="h-6 w-6" />
+                </div>
+                <div>
+                  <DialogTitle className="text-lg">{device.name}</DialogTitle>
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                    <Badge variant="outline" className="text-[10px]" style={{ color: spec?.color, borderColor: `${spec?.color}40` }}>
+                      {device.type}
+                    </Badge>
+                    {device.isReal && (
+                      <Badge variant="outline" className="gap-1 text-[10px] border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+                        <Usb className="h-2.5 w-2.5" />
+                        ESP connected
+                      </Badge>
+                    )}
+                    <StatusBadge status={device.status} />
+                    {device.firmwareVersion && (
+                      <Badge variant="secondary" className="text-[10px] font-mono">v{device.firmwareVersion}</Badge>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleReboot}
+                  disabled={rebooting || isUpdating || isOffline}
+                  className="h-8"
+                >
+                  {rebooting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCw className="h-3.5 w-3.5" />}
+                  Reboot
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleFactoryReset}
+                  disabled={resetting || isUpdating}
+                  className="h-8 text-amber-700 hover:bg-amber-50 hover:text-amber-800"
+                >
+                  {resetting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCcw className="h-3.5 w-3.5" />}
+                  Reset
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="h-8 w-8 text-rose-500 hover:bg-rose-50 hover:text-rose-600"
+                >
+                  {deleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                </Button>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <ScrollArea className="flex-1 px-6">
+            <div className="space-y-5 py-3">
+              {/* Identity & metadata */}
+              <section>
+                <SectionTitle icon={<Cpu className="h-3.5 w-3.5" />}>Identity</SectionTitle>
+                <div className="grid grid-cols-2 gap-3 text-xs sm:grid-cols-3">
+                  <Meta label="MAC Address" value={device.macAddress} mono />
+                  <Meta label="IP Address" value={device.ipAddress ?? '—'} mono />
+                  <Meta label="Location" value={device.location ?? '—'} />
+                  <Meta label="Chip" value={`${device.type} · ${spec?.cpu ?? ''}`} />
+                  <Meta label="Flash" value={spec?.flash ?? '—'} />
+                  <Meta label="RAM" value={spec?.ram ?? '—'} />
+                  <Meta label="Wi-Fi" value={spec?.wifi ?? '—'} />
+                  <Meta label="Bluetooth" value={spec?.bluetooth ?? '—'} />
+                  <Meta label="GPIO Pins" value={`${spec?.pins ?? '—'} total`} />
+                </div>
+                {device.description && (
+                  <div className="mt-3 rounded-lg bg-slate-50 p-3 text-xs text-slate-600 dark:bg-slate-900 dark:text-slate-400">
+                    {device.description}
+                  </div>
+                )}
+              </section>
+
+              <Separator />
+
+              {/* Live telemetry */}
+              {!isUpdating && !isOffline && (
+                <section>
+                  <SectionTitle icon={<Thermometer className="h-3.5 w-3.5" />}>Live Telemetry</SectionTitle>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <Metric
+                      icon={<Thermometer className="h-3.5 w-3.5" />}
+                      label="CPU Temp"
+                      value={device.cpuTemp != null ? `${device.cpuTemp.toFixed(1)}°C` : '—'}
+                      tone={tempSev === 'hot' ? 'danger' : tempSev === 'warm' ? 'warn' : 'ok'}
+                    />
+                    <Metric
+                      icon={<Signal className="h-3.5 w-3.5" />}
+                      label="Wi-Fi RSSI"
+                      value={device.wifiRssi != null ? `${device.wifiRssi} dBm` : '—'}
+                      sub={wifi?.label}
+                      tone={wifi && wifi.pct > 60 ? 'ok' : wifi && wifi.pct > 30 ? 'warn' : 'danger'}
+                    />
+                    <Metric
+                      icon={<MemoryStick className="h-3.5 w-3.5" />}
+                      label="Heap Used"
+                      value={heapPct != null ? `${heapPct}%` : '—'}
+                      sub={device.heapUsed != null && device.heapTotal ? `${formatBytes(device.heapUsed)} / ${formatBytes(device.heapTotal)}` : undefined}
+                    />
+                    <Metric
+                      icon={<Clock className="h-3.5 w-3.5" />}
+                      label="Uptime"
+                      value={device.uptimeSeconds ? formatUptime(device.uptimeSeconds) : '—'}
+                    />
+                  </div>
+
+                  {/* Storage bars */}
+                  <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <StorageBar
+                      icon={<MemoryStick className="h-3.5 w-3.5" />}
+                      label="Heap"
+                      used={device.heapUsed}
+                      total={device.heapTotal}
+                    />
+                    <StorageBar
+                      icon={<HardDrive className="h-3.5 w-3.5" />}
+                      label="Flash"
+                      used={device.flashUsed}
+                      total={device.flashTotal}
+                    />
+                  </div>
+
+                  {device.lastSeenAt && (
+                    <p className="mt-3 text-[11px] text-slate-400 dark:text-slate-500">
+                      Last seen {new Date(device.lastSeenAt).toLocaleString()}
+                    </p>
+                  )}
+                </section>
+              )}
+
+              {isUpdating && (
+                <section className="rounded-lg bg-amber-50 p-4 dark:bg-amber-950/30">
+                  <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-sm font-medium">Firmware update in progress…</span>
+                  </div>
+                  <p className="mt-1 text-xs text-amber-700/80 dark:text-amber-300/80">
+                    The device is downloading and applying the new firmware. It will come back online automatically when complete.
+                  </p>
+                </section>
+              )}
+
+              {isOffline && (
+                <section className="rounded-lg bg-slate-50 p-4 dark:bg-slate-900">
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                    <AlertTriangle className="h-4 w-4" />
+                    <span className="text-sm font-medium">Device is offline</span>
+                  </div>
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    {device.lastSeenAt
+                      ? `Last seen ${new Date(device.lastSeenAt).toLocaleString()}`
+                      : 'Device has not yet reported to the dashboard.'}
+                  </p>
+                </section>
+              )}
+
+              <Separator />
+
+              {/* GPIO control */}
+              <section>
+                <SectionTitle icon={<Power className="h-3.5 w-3.5" />}>GPIO Control</SectionTitle>
+                <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
+                  Toggle individual GPIO pins to control relays, LEDs, and other peripherals attached to this device.
+                </p>
+                {device.gpioState && Object.keys(device.gpioState).length > 0 ? (
+                  <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8">
+                    {Object.entries(device.gpioState).map(([pin, on]) => (
+                      <button
+                        key={pin}
+                        onClick={() => handleToggleGpio(Number(pin), on)}
+                        disabled={isUpdating || isOffline}
+                        className={`flex flex-col items-center gap-1 rounded-lg border-2 p-2 transition-all disabled:opacity-50 ${
+                          on
+                            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40'
+                            : 'border-slate-200 bg-slate-50 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700'
+                        }`}
+                      >
+                        <span className="text-[10px] font-medium uppercase tracking-wide text-slate-400">GPIO</span>
+                        <span className="font-mono text-sm font-bold text-slate-700 dark:text-slate-300">{pin}</span>
+                        <span className={`text-[9px] font-semibold ${on ? 'text-emerald-600' : 'text-slate-400'}`}>
+                          {on ? 'HIGH' : 'LOW'}
+                        </span>
+                        <div className={`h-1.5 w-full rounded-full ${on ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-lg border border-dashed border-slate-200 p-4 text-center text-xs text-slate-400 dark:border-slate-700">
+                    Waiting for GPIO state from ESP...
+                  </div>
+                )}
+              </section>
+
+              <Separator />
+
+              {/* Serial command console */}
+              <section>
+                <SectionTitle icon={<Send className="h-3.5 w-3.5" />}>Serial Command</SectionTitle>
+                <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
+                  Send arbitrary commands to the device&apos;s serial console. Useful for debugging and one-off operations.
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    value={command}
+                    onChange={(e) => setCommand(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleSendCommand() }}
+                    placeholder="e.g. sys.info, wifi.scan, mqtt.status"
+                    className="font-mono text-sm"
+                    disabled={isUpdating || isOffline}
+                  />
+                  <Button
+                    onClick={handleSendCommand}
+                    disabled={!command.trim() || isUpdating || isOffline}
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-700"
+                  >
+                    <Send className="h-3.5 w-3.5" />
+                    Send
+                  </Button>
+                </div>
+              </section>
+            </div>
+          </ScrollArea>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function SectionTitle({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <h3 className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+      <span className="text-slate-400">{icon}</span>
+      {children}
+    </h3>
+  )
+}
+
+function Meta({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <div className="rounded-lg bg-slate-50 p-2.5 dark:bg-slate-900">
+      <div className="text-[10px] font-medium uppercase tracking-wide text-slate-400">{label}</div>
+      <div className={`mt-0.5 truncate text-xs text-slate-700 dark:text-slate-300 ${mono ? 'font-mono' : ''}`} title={value}>
+        {value}
+      </div>
+    </div>
+  )
+}
+
+function Metric({
+  icon,
+  label,
+  value,
+  sub,
+  tone = 'neutral',
+}: {
+  icon: React.ReactNode
+  label: string
+  value: string
+  sub?: string
+  tone?: 'ok' | 'warn' | 'danger' | 'neutral'
+}) {
+  const toneClass = {
+    ok: 'text-emerald-600',
+    warn: 'text-amber-600',
+    danger: 'text-rose-600',
+    neutral: 'text-slate-700 dark:text-slate-300',
+  }[tone]
+  return (
+    <div className="rounded-lg border border-slate-100 bg-white p-3 dark:border-slate-800 dark:bg-slate-950">
+      <div className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wide text-slate-400">
+        {icon}
+        {label}
+      </div>
+      <div className={`mt-1 text-lg font-bold ${toneClass}`}>{value}</div>
+      {sub && <div className="text-[10px] text-slate-400">{sub}</div>}
+    </div>
+  )
+}
+
+function StorageBar({
+  icon, label, used, total,
+}: { icon: React.ReactNode; label: string; used: number | null; total: number | null }) {
+  const pct = used != null && total ? Math.min(100, Math.round((used / total) * 100)) : 0
+  const tone = pct > 85 ? 'bg-rose-500' : pct > 65 ? 'bg-amber-500' : 'bg-emerald-500'
+  return (
+    <div className="rounded-lg border border-slate-100 bg-white p-3 dark:border-slate-800 dark:bg-slate-950">
+      <div className="flex items-center justify-between text-xs">
+        <span className="flex items-center gap-1.5 font-medium text-slate-600 dark:text-slate-300">
+          {icon}
+          {label}
+        </span>
+        <span className="text-slate-500 dark:text-slate-400">
+          {used != null ? formatBytes(used) : '—'} / {total ? formatBytes(total) : '—'}
+        </span>
+      </div>
+      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+        <div className={`h-full rounded-full ${tone}`} style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  )
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const config: Record<string, { label: string; cls: string }> = {
+    online:   { label: 'Online',   cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' },
+    offline:  { label: 'Offline',  cls: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400' },
+    updating: { label: 'Updating', cls: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' },
+    error:    { label: 'Error',    cls: 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300' },
+  }
+  const c = config[status] ?? config.offline
+  return <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${c.cls}`}>
+    <span className="relative flex h-1.5 w-1.5">
+      {(status === 'online' || status === 'updating') && (
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-current opacity-60" />
+      )}
+      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-current" />
+    </span>
+    {c.label}
+  </span>
+}
