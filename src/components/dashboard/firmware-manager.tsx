@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { CheckCircle2, FileBox, HardDrive, Hash, Plus, Trash2, Upload, FileUp } from 'lucide-react'
+import { CheckCircle2, FileBox, HardDrive, Hash, Plus, Trash2, Upload, FileUp, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -205,9 +205,22 @@ function FirmwareCard({
             )}
           </div>
         </div>
-        <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-rose-500" onClick={handleDelete}>
-          <Trash2 className="h-3.5 w-3.5" />
-        </Button>
+        <div className="flex gap-1">
+          {firmware.hasBinary && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-slate-400 hover:text-emerald-500"
+              onClick={() => window.open(`/api/firmware/${firmware.id}/bin`, '_blank')}
+              title="Download .bin file"
+            >
+              <Download className="h-3.5 w-3.5" />
+            </Button>
+          )}
+          <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-rose-500" onClick={handleDelete} title="Delete firmware">
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        </div>
       </div>
 
       {firmware.description && (
