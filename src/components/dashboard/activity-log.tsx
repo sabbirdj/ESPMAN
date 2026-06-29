@@ -5,7 +5,6 @@ import {
   Activity, AlertTriangle, CheckCircle2, Cpu, Info, Radio, RotateCw, XCircle,
 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { useDashboardStore } from '@/lib/store'
 import type { LogEntry } from '@/lib/types'
 
@@ -64,7 +63,7 @@ export function ActivityLog({ height = 'h-[420px]' }: { height?: string }) {
           {logs.length} events
         </span>
       </div>
-      <ScrollArea className={`flex-1 ${height}`}>
+      <div className={`flex-1 overflow-y-auto ${height}`}>
         <div className="divide-y divide-slate-50 dark:divide-slate-900">
           {loading && logs.length === 0 ? (
             <div className="p-6 text-center text-xs text-slate-400">Loading activity log…</div>
@@ -98,7 +97,7 @@ export function ActivityLog({ height = 'h-[420px]' }: { height?: string }) {
             })
           )}
         </div>
-      </ScrollArea>
+      </div>
     </Card>
   )
 }

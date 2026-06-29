@@ -175,7 +175,7 @@ export default function Home() {
                 </div>
                 <div className="space-y-6">
                   <FleetBreakdown />
-                  <ActivityLog height="h-[420px]" />
+                  <ActivityLog height="h-[250px]" />
                 </div>
               </div>
             </div>
