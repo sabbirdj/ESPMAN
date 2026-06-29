@@ -157,12 +157,12 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
           className="h-2 w-full shrink-0"
           style={{ backgroundColor: spec?.color ?? '#64748b' }}
         />
-        <div className="flex flex-1 flex-col overflow-hidden min-h-0">
+        <div className="flex-1 overflow-y-auto min-h-0">
           <DialogHeader className="px-6 pb-2 pt-4">
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-start gap-3">
                 <div
-                  className="flex h-12 w-12 items-center justify-center rounded-lg text-white shadow-sm"
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg text-white shadow-sm"
                   style={{ backgroundColor: spec?.color ?? '#10b981' }}
                 >
                   <Cpu className="h-6 w-6" />
@@ -220,7 +220,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
             </div>
           </DialogHeader>
 
-          <div className="flex border-b border-neutral-200 px-6 dark:border-neutral-800">
+          <div className="sticky top-0 z-10 flex border-b border-neutral-200 bg-background px-6 dark:border-neutral-800">
             <button
               onClick={() => setActiveTab('telemetry')}
               className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'telemetry' ? 'border-neutral-900 text-neutral-900 dark:border-neutral-100 dark:text-neutral-100' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300'}`}
@@ -241,7 +241,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-6 min-h-0">
+          <div className="px-6">
             <div className="space-y-5 py-5">
               {/* Telemetry Tab */}
               {activeTab === 'telemetry' && (
