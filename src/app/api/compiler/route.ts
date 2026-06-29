@@ -47,15 +47,20 @@ export async function POST(req: Request) {
     await fs.mkdir(tmpDir, { recursive: true })
     
     try {
-      // 1. Process user code directly (no merging required)
+      // 1. Process user code directly
       yield 'Processing firmware code...'
       
-      // Write code to temp dir
+      // Write user code to temp dir
       const sketchFile = path.join(tmpDir, `${path.basename(tmpDir)}.ino`)
       await fs.writeFile(sketchFile, code)
-      yield 'Code saved. Invoking compiler...'
+      
+      // 2. Copy ESPMAN library into sketch folder
+      yield 'Injecting ESPMAN Library...'
+      const libPath = path.join(process.cwd(), 'firmware', 'espman-lib')
+      await fs.copyFile(path.join(libPath, 'ESPMAN.h'), path.join(tmpDir, 'ESPMAN.h'))
+      await fs.copyFile(path.join(libPath, 'ESPMAN.cpp'), path.join(tmpDir, 'ESPMAN.cpp'))
 
-      // 4. Compile with arduino-cli
+      yield 'Code saved. Invoking compiler...'
       // Note: arduino-cli must be in PATH. We use ~/.local/bin/arduino-cli for ubuntu VPS
       // or arduino-cli if it's globally installed.
       const buildPath = path.join(tmpDir, 'build')

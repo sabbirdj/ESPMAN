@@ -97,7 +97,7 @@ export function CloudCompiler() {
               Arduino Editor
             </div>
             <div className="text-xs text-slate-500">
-              Full Firmware Source Code
+              ESPMAN C++ Library Included
             </div>
           </div>
           <div className="h-[500px] w-full">
@@ -206,10 +206,10 @@ export function CloudCompiler() {
             <div className="mt-4 rounded-md bg-emerald-50 p-3 text-xs text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200 border border-emerald-100 dark:border-emerald-800">
               <p className="font-semibold mb-1">How it works:</p>
               <ul className="list-disc pl-4 space-y-1">
-                <li>The editor loads your full ESP firmware code.</li>
-                <li>Add your custom sensors/logic directly.</li>
-                <li>The resulting binary is saved to your OTA registry.</li>
-                <li>Deploy to any device instantly!</li>
+                <li>Your custom code uses the ESPMAN library.</li>
+                <li>Set your custom config (Wi-Fi, Server) in setup().</li>
+                <li>The ESPMAN C++ files are compiled together automatically.</li>
+                <li>Deploy to any device instantly via OTA!</li>
               </ul>
             </div>
           </div>

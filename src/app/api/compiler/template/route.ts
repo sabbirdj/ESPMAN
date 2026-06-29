@@ -1,15 +1,37 @@
 import { NextResponse } from 'next/server'
-import { promises as fs } from 'fs'
-import path from 'path'
 
 export async function GET() {
-  try {
-    const corePath = path.join(process.cwd(), 'firmware', 'esp-manager', 'esp-manager.ino')
-    const coreCode = await fs.readFile(corePath, 'utf8')
-    return new NextResponse(coreCode, {
-      headers: { 'Content-Type': 'text/plain' }
-    })
-  } catch (err) {
-    return NextResponse.json({ error: 'Failed to load template' }, { status: 500 })
-  }
+  const boilerplate = `#include "ESPMAN.h"
+
+ESPManager manager;
+
+void setup() {
+  // 1. Configure your device
+  manager.setWiFi("YOUR_WIFI_SSID", "YOUR_WIFI_PASSWORD");
+  manager.setServer("13.62.213.148", 3004, 3000, false);
+  manager.setDevice("My Custom ESP", "1.0.0");
+  
+  // 2. Start ESPMAN core (connects to Wi-Fi and Server)
+  manager.begin();
+
+  // ==========================================
+  // ADD YOUR CUSTOM SETUP LOGIC BELOW
+  // ==========================================
+  
+}
+
+void loop() {
+  // 1. Process ESPMAN background tasks (OTA, WebSocket)
+  manager.loop();
+
+  // ==========================================
+  // ADD YOUR CUSTOM LOOP LOGIC BELOW
+  // ==========================================
+  
+}
+`
+
+  return new NextResponse(boilerplate, {
+    headers: { 'Content-Type': 'text/plain' }
+  })
 }
