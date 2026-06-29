@@ -49,7 +49,7 @@ export function DeviceCard({ device, onSelect, onReboot }: DeviceCardProps) {
 
   return (
     <Card
-      className={`group relative overflow-hidden border-slate-200 bg-white transition-all hover:shadow-lg hover:shadow-slate-200/50 dark:border-slate-800 dark:bg-slate-950 dark:hover:shadow-black/40 ${
+      className={`group relative overflow-hidden border-slate-200 bg-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200/50 dark:border-slate-800 dark:bg-slate-950 dark:hover:shadow-black/40 ${
         isUpdating ? 'ring-2 ring-amber-300' : ''
       }`}
     >

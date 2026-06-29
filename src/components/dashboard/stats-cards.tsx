@@ -67,13 +67,13 @@ export function StatsCards() {
   ]
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="stagger-children grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {cards.map((card) => {
         const Icon = card.icon
         return (
           <Card
             key={card.label}
-            className="relative overflow-hidden border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-950"
+            className="relative overflow-hidden border-slate-200 bg-white p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-950"
           >
             <div className="flex items-start justify-between">
               <div className="flex flex-col">

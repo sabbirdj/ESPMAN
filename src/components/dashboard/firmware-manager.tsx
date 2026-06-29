@@ -82,7 +82,7 @@ export function FirmwareManager() {
           <p className="text-xs text-slate-400">Click "Upload Firmware" to upload your first .bin file</p>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="stagger-children grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
           {firmwares.map((fw) => (
             <FirmwareCard key={fw.id} firmware={fw} devices={devices} onChanged={loadFirmware} />
           ))}
@@ -178,7 +178,7 @@ function FirmwareCard({
   }
 
   return (
-    <Card className="flex flex-col border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-950">
+    <Card className="flex flex-col border-slate-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-950">
       <div className="flex items-start gap-3">
         <div
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white"

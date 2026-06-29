@@ -75,7 +75,7 @@ export function ActivityLog({ height = 'h-[420px]' }: { height?: string }) {
               const EventIcon = eventIcon[log.event] ?? Cpu
               const LevelIcon = level.icon
               return (
-                <div key={log.id} className="flex items-start gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                <div key={log.id} className="flex items-start gap-3 px-4 py-2.5 transition-colors duration-150 hover:bg-slate-50 dark:hover:bg-slate-900/50">
                   <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${level.iconCls}`}>
                     <LevelIcon className="h-3 w-3" />
                   </div>

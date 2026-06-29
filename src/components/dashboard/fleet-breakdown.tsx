@@ -51,7 +51,7 @@ export function FleetBreakdown() {
               key={type}
               style={{ width: `${pct}%`, backgroundColor: spec?.color ?? '#10b981' }}
               title={`${type}: ${count}`}
-              className="h-full transition-all"
+              className="h-full transition-all duration-500"
             />
           )
         })}

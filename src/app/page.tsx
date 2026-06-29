@@ -142,7 +142,7 @@ export default function Home() {
 
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           {view === 'dashboard' && (
-            <div className="space-y-6">
+            <div className="animate-fade-in space-y-6">
               <StatsCards />
 
               <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
@@ -161,7 +161,7 @@ export default function Home() {
                       <span className="text-sm text-slate-400">No devices registered yet</span>
                     </Card>
                   ) : (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="stagger-children grid grid-cols-1 gap-4 sm:grid-cols-2">
                       {recentDevices.map((device) => (
                         <DeviceCard
                           key={device.id}
@@ -182,7 +182,7 @@ export default function Home() {
           )}
 
           {view === 'devices' && (
-            <div className="space-y-6">
+            <div className="animate-fade-in space-y-6">
               <StatsCards />
               <DeviceGrid
                 searchQuery={search}
@@ -193,15 +193,19 @@ export default function Home() {
           )}
 
           {view === 'firmware' && (
-            <FirmwareManager />
+            <div className="animate-fade-in">
+              <FirmwareManager />
+            </div>
           )}
 
           {view === 'compiler' && (
-            <CloudCompiler />
+            <div className="animate-fade-in">
+              <CloudCompiler />
+            </div>
           )}
 
           {view === 'logs' && (
-            <div className="space-y-4">
+            <div className="animate-fade-in space-y-4">
               <Card className="flex items-center gap-3 border-slate-200 bg-emerald-50 p-4 dark:border-emerald-900 dark:bg-emerald-950/30">
                 <Radio className="h-5 w-5 text-emerald-500" />
                 <div>
