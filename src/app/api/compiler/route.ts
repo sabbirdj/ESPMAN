@@ -119,7 +119,7 @@ void loop() {
       if (dependencies && typeof dependencies === 'string') {
         const libs = dependencies.split(',').map(l => l.trim()).filter(l => l.length > 0)
         for (const lib of libs) {
-          yield \`Installing library: \${lib}...\`
+          yield `Installing library: ${lib}...`
           
           const installChild = spawn(arduinoCliPath, [
             'lib',
@@ -131,13 +131,13 @@ void loop() {
             yield chunk.toString().trim()
           }
           for await (const chunk of installChild.stderr) {
-            yield \`[WARN] \${chunk.toString().trim()}\`
+            yield `[WARN] ${chunk.toString().trim()}`
           }
 
           const installExitCode = await new Promise((resolve) => installChild.on('close', resolve))
           if (installExitCode !== 0) {
-            yield \`[ERROR] Failed to install library: \${lib}\`
-            throw new Error(\`Failed to install library: \${lib}\`)
+            yield `[ERROR] Failed to install library: ${lib}`
+            throw new Error(`Failed to install library: ${lib}`)
           }
         }
       }
