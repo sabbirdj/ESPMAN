@@ -88,6 +88,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
             <Wifi className="h-3 w-3" />
             <span>device-service · port 3003</span>
           </div>
+        </div>
       </div>
     </aside>
   )
