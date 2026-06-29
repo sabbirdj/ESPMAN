@@ -8,25 +8,30 @@ import { createClient, type Client } from '@libsql/client'
 //    2. TURSO (production) — DATABASE_URL is "libsql://<db-name>-<org>.turso.io"
 //       + TURSO_AUTH_TOKEN for authentication
 //
-//  This wrapper provides a Prisma-like API so the existing route handlers
-//  don't need to change much. It maps the 3 models (Device, Firmware,
-//  TelemetryLog) to @libsql/client queries.
+//  LAZY INITIALIZATION: The client is only created on the first query,
+//  NOT at module load time. This prevents `next build` from failing when
+//  environment variables aren't available during the build step.
 // ============================================================================
 
-function createDbClient(): Client {
+let _client: Client | null = null
+
+function getClient(): Client {
+  if (_client) return _client
+
   const url = process.env.DATABASE_URL
   const authToken = process.env.TURSO_AUTH_TOKEN
 
   if (!url) {
-    console.warn('[db] DATABASE_URL not set, using local file')
-    return createClient({ url: 'file:./db/custom.db' })
+    // During `next build`, env vars may not be loaded yet. Use a placeholder
+    // that won't actually be queried (the build doesn't make real queries).
+    console.warn('[db] DATABASE_URL not set, using local file fallback')
+    _client = createClient({ url: 'file:./db/custom.db' })
+    return _client
   }
 
-  console.log(`[db] connecting to: ${url.slice(0, 30)}...`)
-  return createClient({ url, authToken })
+  _client = createClient({ url, authToken })
+  return _client
 }
-
-const client = createDbClient()
 
 // ============================================================================
 //  Prisma-like query builder for the Device model
@@ -46,7 +51,7 @@ export const db = {
         args.push(where.type)
       }
       if (conditions.length) sql += ' WHERE ' + conditions.join(' AND ')
-      const result = await client.execute({ sql, args })
+      const result = await getClient().execute({ sql, args })
       return Number((result.rows[0] as any).cnt)
     },
 
@@ -67,7 +72,7 @@ export const db = {
       sql += ' ORDER BY ' + (opts?.orderBy?.createdAt === 'asc' ? 'createdAt ASC' : 'createdAt DESC')
       if (opts?.take) sql += ` LIMIT ${opts.take}`
 
-      const result = await client.execute({ sql, args })
+      const result = await getClient().execute({ sql, args })
       let devices = result.rows as any[]
 
       // Include firmware if requested
@@ -75,7 +80,7 @@ export const db = {
         const firmwareIds = devices.map((d) => d.firmwareId).filter(Boolean)
         if (firmwareIds.length > 0) {
           const placeholders = firmwareIds.map(() => '?').join(',')
-          const fwResult = await client.execute({
+          const fwResult = await getClient().execute({
             sql: `SELECT * FROM Firmware WHERE id IN (${placeholders})`,
             args: firmwareIds,
           })
@@ -91,7 +96,7 @@ export const db = {
       if (opts?.include?.telemetryLogs && devices.length > 0) {
         const deviceIds = devices.map((d) => d.id)
         const placeholders = deviceIds.map(() => '?').join(',')
-        const logsResult = await client.execute({
+        const logsResult = await getClient().execute({
           sql: `SELECT * FROM TelemetryLog WHERE deviceId IN (${placeholders}) ORDER BY createdAt DESC LIMIT 50`,
           args: deviceIds,
         })
@@ -117,7 +122,7 @@ export const db = {
       if (opts.where.macAddress) { conditions.push('macAddress = ?'); args.push(opts.where.macAddress) }
       if (conditions.length) sql += ' WHERE ' + conditions.join(' AND ')
       sql += ' LIMIT 1'
-      const result = await client.execute({ sql, args })
+      const result = await getClient().execute({ sql, args })
       return (result.rows[0] as any) ?? null
     },
 
@@ -129,14 +134,14 @@ export const db = {
       if (opts.where.type) { conditions.push('type = ?'); args.push(opts.where.type) }
       if (conditions.length) sql += ' WHERE ' + conditions.join(' AND ')
       sql += ' LIMIT 1'
-      const result = await client.execute({ sql, args })
+      const result = await getClient().execute({ sql, args })
       return (result.rows[0] as any) ?? null
     },
 
     async create(opts: { data: any }) {
       const d = opts.data
       const id = d.id || 'cm' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36)
-      await client.execute({
+      await getClient().execute({
         sql: `INSERT INTO Device (id, name, type, macAddress, ipAddress, firmwareId, firmwareVersion, status, location, description, cpuTemp, heapUsed, heapTotal, flashUsed, flashTotal, wifiRssi, uptimeSeconds, gpioState, lastSeenAt, createdAt, updatedAt)
               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
         args: [
@@ -173,7 +178,7 @@ export const db = {
       }
       fields.push("updatedAt = datetime('now')")
       args.push(opts.where.id)
-      await client.execute({
+      await getClient().execute({
         sql: `UPDATE Device SET ${fields.join(', ')} WHERE id = ?`,
         args,
       })
@@ -190,17 +195,17 @@ export const db = {
       const conditions: string[] = []
       if (opts.where.firmwareId) { conditions.push('firmwareId = ?'); args.push(opts.where.firmwareId) }
       const sql = `UPDATE Device SET ${fields.join(', ')}${conditions.length ? ' WHERE ' + conditions.join(' AND ') : ''}`
-      await client.execute({ sql, args })
+      await getClient().execute({ sql, args })
       return { count: 1 }
     },
 
     async delete(opts: { where: { id: string } }) {
-      await client.execute({ sql: 'DELETE FROM Device WHERE id = ?', args: [opts.where.id] })
+      await getClient().execute({ sql: 'DELETE FROM Device WHERE id = ?', args: [opts.where.id] })
     },
 
     async groupBy(opts: { by: string[]; _count: any }) {
       const by = opts.by.join(', ')
-      const result = await client.execute({ sql: `SELECT ${by}, COUNT(*) as _count FROM Device GROUP BY ${by}` })
+      const result = await getClient().execute({ sql: `SELECT ${by}, COUNT(*) as _count FROM Device GROUP BY ${by}` })
       return result.rows.map((r: any) => ({
         type: r.type,
         _count: { _all: r._count },
@@ -210,17 +215,17 @@ export const db = {
 
   firmware: {
     async count() {
-      const result = await client.execute('SELECT COUNT(*) as cnt FROM Firmware')
+      const result = await getClient().execute('SELECT COUNT(*) as cnt FROM Firmware')
       return Number((result.rows[0] as any).cnt)
     },
 
     async findMany(opts?: { include?: { _count?: boolean } }) {
       let sql = 'SELECT * FROM Firmware ORDER BY createdAt DESC'
-      const result = await client.execute(sql)
+      const result = await getClient().execute(sql)
       let firmwares = result.rows as any[]
       if (opts?.include?._count) {
         for (const fw of firmwares) {
-          const countResult = await client.execute({
+          const countResult = await getClient().execute({
             sql: 'SELECT COUNT(*) as cnt FROM Device WHERE firmwareId = ?',
             args: [fw.id],
           })
@@ -231,7 +236,7 @@ export const db = {
     },
 
     async findUnique(opts: { where: { id: string } }) {
-      const result = await client.execute({ sql: 'SELECT * FROM Firmware WHERE id = ?', args: [opts.where.id] })
+      const result = await getClient().execute({ sql: 'SELECT * FROM Firmware WHERE id = ?', args: [opts.where.id] })
       return (result.rows[0] as any) ?? null
     },
 
@@ -243,14 +248,14 @@ export const db = {
       if (opts.where.type) { conditions.push('type = ?'); args.push(opts.where.type) }
       if (conditions.length) sql += ' WHERE ' + conditions.join(' AND ')
       sql += ' LIMIT 1'
-      const result = await client.execute({ sql, args })
+      const result = await getClient().execute({ sql, args })
       return (result.rows[0] as any) ?? null
     },
 
     async create(opts: { data: any }) {
       const d = opts.data
       const id = 'cm' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36)
-      await client.execute({
+      await getClient().execute({
         sql: `INSERT INTO Firmware (id, name, version, type, size, checksum, description, installCount, createdAt, updatedAt)
               VALUES (?, ?, ?, ?, ?, ?, ?, 0, datetime('now'), datetime('now'))`,
         args: [id, d.name, d.version, d.type, d.size, d.checksum, d.description ?? null],
@@ -269,22 +274,22 @@ export const db = {
       }
       fields.push("updatedAt = datetime('now')")
       args.push(opts.where.id)
-      await client.execute({ sql: `UPDATE Firmware SET ${fields.join(', ')} WHERE id = ?`, args })
+      await getClient().execute({ sql: `UPDATE Firmware SET ${fields.join(', ')} WHERE id = ?`, args })
       return this.findUnique({ where: { id: opts.where.id } })
     },
 
     async delete(opts: { where: { id: string } }) {
-      await client.execute({ sql: 'DELETE FROM Firmware WHERE id = ?', args: [opts.where.id] })
+      await getClient().execute({ sql: 'DELETE FROM Firmware WHERE id = ?', args: [opts.where.id] })
     },
 
     async aggregate(opts: { _sum: { installCount: boolean } }) {
-      const result = await client.execute('SELECT SUM(installCount) as cnt FROM Firmware')
+      const result = await getClient().execute('SELECT SUM(installCount) as cnt FROM Firmware')
       return { _sum: { installCount: (result.rows[0] as any).cnt } }
     },
 
     async groupBy(opts: { by: string[]; _count: any }) {
       const by = opts.by.join(', ')
-      const result = await client.execute({ sql: `SELECT ${by}, COUNT(*) as _count FROM Firmware GROUP BY ${by}` })
+      const result = await getClient().execute({ sql: `SELECT ${by}, COUNT(*) as _count FROM Firmware GROUP BY ${by}` })
       return result.rows.map((r: any) => ({
         type: r.type,
         _count: { _all: r._count },
@@ -296,7 +301,7 @@ export const db = {
     async create(opts: { data: any }) {
       const d = opts.data
       const id = 'cm' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36)
-      await client.execute({
+      await getClient().execute({
         sql: `INSERT INTO TelemetryLog (id, deviceId, event, message, level, createdAt)
               VALUES (?, ?, ?, ?, ?, datetime('now'))`,
         args: [id, d.deviceId, d.event, d.message, d.level ?? 'info'],
@@ -313,12 +318,12 @@ export const db = {
       }
       sql += ' ORDER BY ' + (opts?.orderBy?.createdAt === 'asc' ? 'createdAt ASC' : 'createdAt DESC')
       if (opts?.take) sql += ` LIMIT ${opts.take}`
-      const result = await client.execute({ sql, args })
+      const result = await getClient().execute({ sql, args })
       let logs = result.rows as any[]
       if (opts?.include?.device && logs.length > 0) {
         const deviceIds = [...new Set(logs.map((l) => l.deviceId))]
         const placeholders = deviceIds.map(() => '?').join(',')
-        const devicesResult = await client.execute({
+        const devicesResult = await getClient().execute({
           sql: `SELECT id, name, type FROM Device WHERE id IN (${placeholders})`,
           args: deviceIds,
         })
@@ -330,4 +335,4 @@ export const db = {
   },
 }
 
-export { client as rawDbClient }
+export { getClient as rawDbClient }
