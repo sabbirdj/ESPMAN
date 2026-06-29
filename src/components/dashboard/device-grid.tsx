@@ -42,7 +42,7 @@ export function DeviceGrid({ searchQuery, onSelectDevice, onRebootDevice }: Devi
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <Tabs value={statusFilter} onValueChange={setStatusFilter}>
-          <TabsList className="h-9 bg-slate-100 dark:bg-slate-900">
+          <TabsList className="h-9 bg-neutral-100 dark:bg-neutral-900">
             <TabsTrigger value="all" className="text-xs">All</TabsTrigger>
             <TabsTrigger value="online" className="text-xs">Online</TabsTrigger>
             <TabsTrigger value="updating" className="text-xs">Updating</TabsTrigger>
@@ -63,7 +63,7 @@ export function DeviceGrid({ searchQuery, onSelectDevice, onRebootDevice }: Devi
           </SelectContent>
         </Select>
 
-        <span className="ml-auto text-xs text-slate-500 dark:text-slate-400">
+        <span className="ml-auto text-xs text-neutral-500 dark:text-neutral-400">
           {filtered.length} of {devices.length} devices
         </span>
       </div>

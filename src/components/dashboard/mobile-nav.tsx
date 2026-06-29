@@ -16,7 +16,7 @@ export function MobileNav({ activeView, onViewChange }: MobileNavProps) {
     { id: 'logs' as const, label: 'Logs', icon: Radio },
   ]
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 flex border-t border-slate-200 bg-white/95 backdrop-blur md:hidden dark:border-slate-800 dark:bg-slate-950/95">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 flex border-t border-neutral-200 bg-white/95 backdrop-blur md:hidden dark:border-neutral-800 dark:bg-neutral-950/95">
       {items.map((item) => {
         const Icon = item.icon
         const active = activeView === item.id
@@ -25,7 +25,7 @@ export function MobileNav({ activeView, onViewChange }: MobileNavProps) {
             key={item.id}
             onClick={() => onViewChange(item.id)}
             className={`flex flex-1 flex-col items-center gap-1 py-2.5 text-[10px] font-medium ${
-              active ? 'text-slate-900 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400'
+              active ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500 dark:text-neutral-400'
             }`}
           >
             <Icon className="h-4 w-4" />

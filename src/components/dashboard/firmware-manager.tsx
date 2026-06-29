@@ -60,26 +60,26 @@ export function FirmwareManager() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Firmware Library</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Firmware Library</h2>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400">
             Upload firmware .bin files and install them onto your ESP devices over the air (OTA).
           </p>
         </div>
-        <Button onClick={() => setUploadOpen(true)} size="sm" className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900">
+        <Button onClick={() => setUploadOpen(true)} size="sm" className="bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 dark:text-neutral-900">
           <Upload className="h-4 w-4" />
           Upload Firmware
         </Button>
       </div>
 
       {loading ? (
-        <Card className="flex h-32 items-center justify-center border-slate-200 dark:border-slate-800">
-          <span className="text-sm text-slate-400">Loading firmware library…</span>
+        <Card className="flex h-32 items-center justify-center border-neutral-200 dark:border-neutral-800">
+          <span className="text-sm text-neutral-400">Loading firmware library…</span>
         </Card>
       ) : firmwares.length === 0 ? (
-        <Card className="flex h-32 flex-col items-center justify-center border-dashed border-slate-300 dark:border-slate-700">
-          <FileBox className="h-8 w-8 text-slate-400" />
-          <p className="mt-2 text-sm text-slate-500">No firmware uploaded yet</p>
-          <p className="text-xs text-slate-400">Click "Upload Firmware" to upload your first .bin file</p>
+        <Card className="flex h-32 flex-col items-center justify-center border-dashed border-neutral-300 dark:border-neutral-700">
+          <FileBox className="h-8 w-8 text-neutral-400" />
+          <p className="mt-2 text-sm text-neutral-500">No firmware uploaded yet</p>
+          <p className="text-xs text-neutral-400">Click "Upload Firmware" to upload your first .bin file</p>
         </Card>
       ) : (
         <div className="stagger-children grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
@@ -178,7 +178,7 @@ function FirmwareCard({
   }
 
   return (
-    <Card className="flex flex-col border-slate-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-950">
+    <Card className="flex flex-col border-neutral-200 bg-white p-4 transition-all duration-200 hover:-tranneutral-y-0.5 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-950">
       <div className="flex items-start gap-3">
         <div
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white"
@@ -188,13 +188,13 @@ function FirmwareCard({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{firmware.name}</h3>
+            <h3 className="truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100">{firmware.name}</h3>
             <Badge variant="outline" className="px-1.5 py-0 text-[10px]" style={{ color: spec?.color, borderColor: `${spec?.color}40` }}>
               {firmware.type}
             </Badge>
           </div>
-          <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-            <span className="font-mono font-medium text-slate-700 dark:text-slate-300">v{firmware.version}</span>
+          <div className="mt-0.5 flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
+            <span className="font-mono font-medium text-neutral-700 dark:text-neutral-300">v{firmware.version}</span>
             <span>·</span>
             <span>{firmware.size > 0 ? formatBytes(firmware.size) : '—'}</span>
             {firmware._count && (
@@ -210,24 +210,24 @@ function FirmwareCard({
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+              className="h-7 w-7 text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
               onClick={() => window.open(`/api/firmware/${firmware.id}/bin`, '_blank')}
               title="Download .bin file"
             >
               <Download className="h-3.5 w-3.5" />
             </Button>
           )}
-          <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100" onClick={handleDelete} title="Delete firmware">
+          <Button variant="ghost" size="icon" className="h-7 w-7 text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100" onClick={handleDelete} title="Delete firmware">
             <Trash2 className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>
 
       {firmware.description && (
-        <p className="mt-3 line-clamp-2 text-xs text-slate-600 dark:text-slate-400">{firmware.description}</p>
+        <p className="mt-3 line-clamp-2 text-xs text-neutral-600 dark:text-neutral-400">{firmware.description}</p>
       )}
 
-      <div className="mt-3 flex flex-wrap items-center gap-2 text-[10px] text-slate-400 dark:text-slate-500">
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-[10px] text-neutral-400 dark:text-neutral-500">
         <span className="inline-flex items-center gap-1">
           <Hash className="h-3 w-3" />
           <span className="font-mono">{firmware.checksum}</span>
@@ -237,19 +237,19 @@ function FirmwareCard({
           {firmware.installCount} install{firmware.installCount !== 1 ? 's' : ''}
         </span>
         {firmware.hasBinary ? (
-          <Badge variant="outline" className="border-slate-300 bg-slate-100 px-1.5 py-0 text-[10px] text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+          <Badge variant="outline" className="border-neutral-300 bg-neutral-100 px-1.5 py-0 text-[10px] text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
             .bin ready
           </Badge>
         ) : (
-          <Badge variant="outline" className="border-slate-400 bg-slate-200 px-1.5 py-0 text-[10px] text-slate-600 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-400">
+          <Badge variant="outline" className="border-neutral-400 bg-neutral-200 px-1.5 py-0 text-[10px] text-neutral-600 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-400">
             No .bin file
           </Badge>
         )}
       </div>
 
       {/* Install target */}
-      <div className="mt-4 border-t border-slate-100 pt-3 dark:border-slate-800">
-        <Label className="text-[10px] font-medium uppercase tracking-wider text-slate-400">
+      <div className="mt-4 border-t border-neutral-100 pt-3 dark:border-neutral-800">
+        <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">
           Install on {firmware.type} device
         </Label>
         <div className="mt-2 flex gap-2">
@@ -269,14 +269,14 @@ function FirmwareCard({
             size="sm"
             onClick={handleInstall}
             disabled={installing || !targetDeviceId || compatible.length === 0 || !firmware.hasBinary}
-            className="h-8 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900"
+            className="h-8 bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 dark:text-neutral-900"
           >
             <Plus className="h-3.5 w-3.5" />
             Install OTA
           </Button>
         </div>
         {!firmware.hasBinary && (
-          <p className="mt-2 text-[10px] text-slate-600 dark:text-slate-400">
+          <p className="mt-2 text-[10px] text-neutral-600 dark:text-neutral-400">
             ⚠️ No .bin file uploaded. Re-upload this firmware with a .bin file to enable OTA.
           </p>
         )}
@@ -347,7 +347,7 @@ function UploadFirmwareDialog({
         <DialogHeader>
           <DialogTitle className="text-base">Upload Firmware Image</DialogTitle>
           <DialogDescription className="text-xs">
-            Upload a compiled <code className="rounded bg-slate-100 px-1 py-0.5 text-[10px] dark:bg-slate-800">.bin</code> file.
+            Upload a compiled <code className="rounded bg-neutral-100 px-1 py-0.5 text-[10px] dark:bg-neutral-800">.bin</code> file.
             The ESP will download this file over HTTP when you click "Install OTA".
           </DialogDescription>
         </DialogHeader>
@@ -389,16 +389,16 @@ function UploadFirmwareDialog({
             <Textarea id="fw-desc" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="What does this firmware do? What's new in this version?" rows={2} />
           </div>
           {file && (
-            <div className="flex items-center gap-2 rounded-lg bg-slate-100 p-2 text-xs dark:bg-slate-800">
-              <FileUp className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-              <span className="text-slate-700 dark:text-slate-300">
+            <div className="flex items-center gap-2 rounded-lg bg-neutral-100 p-2 text-xs dark:bg-neutral-800">
+              <FileUp className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
+              <span className="text-neutral-700 dark:text-neutral-300">
                 {file.name} ({formatBytes(file.size)})
               </span>
             </div>
           )}
           <DialogFooter className="gap-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>Cancel</Button>
-            <Button type="submit" disabled={submitting} className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900">
+            <Button type="submit" disabled={submitting} className="bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 dark:text-neutral-900">
               <Upload className="h-4 w-4" />
               {submitting ? 'Uploading…' : 'Upload'}
             </Button>

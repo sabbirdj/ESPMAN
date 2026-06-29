@@ -167,13 +167,13 @@ export function CloudCompiler() {
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       {/* Editor Section */}
       <div className="flex flex-col gap-4 lg:col-span-2">
-        <Card className="flex flex-col overflow-hidden border-slate-200 dark:border-slate-800">
-          <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/50">
-            <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+        <Card className="flex flex-col overflow-hidden border-neutral-200 dark:border-neutral-800">
+          <div className="flex items-center justify-between border-b border-neutral-200 bg-neutral-50 px-4 py-3 dark:border-neutral-800 dark:bg-neutral-900/50">
+            <div className="flex items-center gap-2 text-sm font-medium text-neutral-700 dark:text-neutral-300">
               <Code className="h-4 w-4" />
               Arduino Editor
             </div>
-            <div className="text-xs text-slate-500">
+            <div className="text-xs text-neutral-500">
               ESPMAN framework is automatically injected during compilation
             </div>
           </div>
@@ -197,17 +197,17 @@ export function CloudCompiler() {
         </Card>
 
         {/* Terminal Logs */}
-        <Card className="flex flex-col overflow-hidden border-slate-200 dark:border-slate-800">
-          <div className="flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-2 dark:border-slate-800 dark:bg-slate-900/50">
-            <TerminalSquare className="h-4 w-4 text-slate-500" />
-            <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Compiler Output</span>
+        <Card className="flex flex-col overflow-hidden border-neutral-200 dark:border-neutral-800">
+          <div className="flex items-center gap-2 border-b border-neutral-200 bg-neutral-50 px-4 py-2 dark:border-neutral-800 dark:bg-neutral-900/50">
+            <TerminalSquare className="h-4 w-4 text-neutral-500" />
+            <span className="text-xs font-medium text-neutral-700 dark:text-neutral-300">Compiler Output</span>
           </div>
           <div 
             ref={terminalRef}
-            className="h-[250px] overflow-y-auto bg-[#1e1e1e] p-4 text-xs font-mono text-slate-300"
+            className="h-[250px] overflow-y-auto bg-[#1e1e1e] p-4 text-xs font-mono text-neutral-300"
           >
             {logs.length === 0 ? (
-              <span className="text-slate-600">Waiting for compilation...</span>
+              <span className="text-neutral-600">Waiting for compilation...</span>
             ) : (
               logs.map((log, i) => (
                 <div key={i} className="whitespace-pre-wrap leading-relaxed">{log}</div>
@@ -219,40 +219,40 @@ export function CloudCompiler() {
 
       {/* Sidebar Controls */}
       <div className="flex flex-col gap-6">
-        <Card className="p-5 border-slate-200 dark:border-slate-800">
+        <Card className="p-5 border-neutral-200 dark:border-neutral-800">
           <div className="space-y-4">
-            <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800 pb-2">
+            <div className="flex items-center gap-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 border-b border-neutral-200 dark:border-neutral-800 pb-2">
               <Settings className="h-4 w-4" />
               Settings
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-medium text-slate-500">Firmware Name</label>
+                <label className="text-xs font-medium text-neutral-500">Firmware Name</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                  className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-medium text-slate-500">Version</label>
+                <label className="text-xs font-medium text-neutral-500">Version</label>
                 <input
                   type="text"
                   value={version}
                   onChange={(e) => setVersion(e.target.value)}
-                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                  className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-medium text-slate-500">Target Chip</label>
+                <label className="text-xs font-medium text-neutral-500">Target Chip</label>
                 <select
                   value={chipType}
                   onChange={(e) => setChipType(e.target.value)}
-                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                  className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
                 >
                   <option value="ESP32">ESP32</option>
                   <option value="ESP8266">ESP8266</option>
@@ -260,27 +260,27 @@ export function CloudCompiler() {
               </div>
 
               <div>
-                <label className="text-xs font-medium text-slate-500">Library Dependencies</label>
+                <label className="text-xs font-medium text-neutral-500">Library Dependencies</label>
                 <input
                   type="text"
                   placeholder="e.g. DHT sensor library, Adafruit NeoPixel"
                   value={dependencies}
                   onChange={(e) => setDependencies(e.target.value)}
-                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                  className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
                 />
-                <p className="mt-1 text-[10px] text-slate-500">Comma-separated exact library names.</p>
+                <p className="mt-1 text-[10px] text-neutral-500">Comma-separated exact library names.</p>
               </div>
 
               <div className="pt-2">
-                <div className="flex items-center justify-between mb-3 border-b border-slate-200 dark:border-slate-800 pb-2">
-                  <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                <div className="flex items-center justify-between mb-3 border-b border-neutral-200 dark:border-neutral-800 pb-2">
+                  <div className="flex items-center gap-2 text-sm font-medium text-neutral-700 dark:text-neutral-300">
                     <Wifi className="h-4 w-4" />
                     Hardware Config
                   </div>
                   
                   <Dialog open={isManageDialogOpen} onOpenChange={setIsManageDialogOpen}>
                     <DialogTrigger asChild>
-                      <button className="text-[10px] text-slate-600 hover:text-slate-700 dark:text-slate-400 font-medium bg-slate-100 dark:bg-slate-800/30 px-2 py-1 rounded">
+                      <button className="text-[10px] text-neutral-600 hover:text-neutral-700 dark:text-neutral-400 font-medium bg-neutral-100 dark:bg-neutral-800/30 px-2 py-1 rounded">
                         Manage Profiles
                       </button>
                     </DialogTrigger>
@@ -290,53 +290,53 @@ export function CloudCompiler() {
                       </DialogHeader>
                       <div className="space-y-4 py-2">
                         {/* Add new profile form */}
-                        <div className="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 space-y-3">
-                          <div className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Create New Profile</div>
+                        <div className="bg-neutral-50 dark:bg-neutral-900 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 space-y-3">
+                          <div className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Create New Profile</div>
                           <div className="grid grid-cols-2 gap-3">
                             <div className="col-span-2">
-                              <label className="text-xs font-medium text-slate-500">Profile Name</label>
+                              <label className="text-xs font-medium text-neutral-500">Profile Name</label>
                               <input 
                                 type="text" 
                                 placeholder="e.g. Home"
                                 value={newProfileName}
                                 onChange={e => setNewProfileName(e.target.value)}
-                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                                className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500 dark:border-neutral-700 dark:bg-neutral-950 dark:text-white"
                               />
                             </div>
                             <div>
-                              <label className="text-xs font-medium text-slate-500">Wi-Fi SSID</label>
+                              <label className="text-xs font-medium text-neutral-500">Wi-Fi SSID</label>
                               <input 
                                 type="text" 
                                 placeholder="Network name"
                                 value={newProfileSsid}
                                 onChange={e => setNewProfileSsid(e.target.value)}
-                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                                className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500 dark:border-neutral-700 dark:bg-neutral-950 dark:text-white"
                               />
                             </div>
                             <div>
-                              <label className="text-xs font-medium text-slate-500">Password</label>
+                              <label className="text-xs font-medium text-neutral-500">Password</label>
                               <input 
                                 type="text" 
                                 placeholder="Optional"
                                 value={newProfilePassword}
                                 onChange={e => setNewProfilePassword(e.target.value)}
-                                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                                className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500 dark:border-neutral-700 dark:bg-neutral-950 dark:text-white"
                               />
                             </div>
                           </div>
-                          <Button onClick={handleSaveProfile} size="sm" className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900 mt-2">
+                          <Button onClick={handleSaveProfile} size="sm" className="w-full bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 dark:text-neutral-900 mt-2">
                             <Plus className="h-4 w-4 mr-1" /> Save Profile
                           </Button>
                         </div>
                         
                         {/* List profiles */}
                         {profiles.length > 0 ? (
-                          <div className="border border-slate-200 dark:border-slate-800 rounded-md divide-y divide-slate-100 dark:divide-slate-800/50 max-h-[200px] overflow-y-auto">
+                          <div className="border border-neutral-200 dark:border-neutral-800 rounded-md divide-y divide-neutral-100 dark:divide-neutral-800/50 max-h-[200px] overflow-y-auto">
                             {profiles.map(p => (
-                              <div key={p.id} className="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                              <div key={p.id} className="flex items-center justify-between p-3 hover:bg-neutral-50 dark:hover:bg-neutral-900/50">
                                 <div>
-                                  <div className="text-sm font-medium text-slate-700 dark:text-slate-300">{p.name}</div>
-                                  <div className="text-xs text-slate-500">{p.ssid}</div>
+                                  <div className="text-sm font-medium text-neutral-700 dark:text-neutral-300">{p.name}</div>
+                                  <div className="text-xs text-neutral-500">{p.ssid}</div>
                                 </div>
                                 <div className="flex gap-2">
                                   <Button 
@@ -353,7 +353,7 @@ export function CloudCompiler() {
                                   <Button 
                                     variant="ghost" 
                                     size="icon" 
-                                    className="h-7 w-7 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                    className="h-7 w-7 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300"
                                     onClick={() => handleDeleteProfile(p.id)}
                                   >
                                     <Trash2 className="h-3.5 w-3.5" />
@@ -363,7 +363,7 @@ export function CloudCompiler() {
                             ))}
                           </div>
                         ) : (
-                          <div className="text-center py-6 text-sm text-slate-500 border border-dashed border-slate-200 dark:border-slate-800 rounded-md">
+                          <div className="text-center py-6 text-sm text-neutral-500 border border-dashed border-neutral-200 dark:border-neutral-800 rounded-md">
                             No saved profiles yet
                           </div>
                         )}
@@ -375,11 +375,11 @@ export function CloudCompiler() {
                 <div className="space-y-3">
                   {profiles.length > 0 && (
                     <div>
-                      <label className="text-xs font-medium text-slate-500">Quick Select Profile</label>
+                      <label className="text-xs font-medium text-neutral-500">Quick Select Profile</label>
                       <select
                         value={selectedProfileId}
                         onChange={(e) => handleProfileSelect(e.target.value)}
-                        className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                        className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
                       >
                         <option value="">-- Custom Config --</option>
                         {profiles.map(p => (
@@ -390,34 +390,34 @@ export function CloudCompiler() {
                   )}
                   
                   <div>
-                    <label className="text-xs font-medium text-slate-500">Wi-Fi SSID</label>
+                    <label className="text-xs font-medium text-neutral-500">Wi-Fi SSID</label>
                     <input
                       type="text"
                       placeholder="MyNetwork"
                       value={wifiSsid}
                       onChange={(e) => setWifiSsid(e.target.value)}
-                      className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                      className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs font-medium text-slate-500">Wi-Fi Password</label>
+                    <label className="text-xs font-medium text-neutral-500">Wi-Fi Password</label>
                     <input
                       type="text"
                       placeholder="secret123"
                       value={wifiPassword}
                       onChange={(e) => setWifiPassword(e.target.value)}
-                      className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                      className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs font-medium text-slate-500">Server Host IP</label>
+                    <label className="text-xs font-medium text-neutral-500">Server Host IP</label>
                     <input
                       type="text"
                       value={serverHost}
                       onChange={(e) => setServerHost(e.target.value)}
-                      className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                      className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
                     />
                   </div>
                 </div>
@@ -428,7 +428,7 @@ export function CloudCompiler() {
               <button
                 onClick={handleCompile}
                 disabled={isCompiling}
-                className="flex w-full items-center justify-center gap-2 rounded-md bg-slate-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex w-full items-center justify-center gap-2 rounded-md bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isCompiling ? (
                   <>
@@ -444,7 +444,7 @@ export function CloudCompiler() {
               </button>
             </div>
             
-            <div className="mt-4 rounded-md bg-slate-100 p-3 text-xs text-slate-800 dark:bg-slate-800/30 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
+            <div className="mt-4 rounded-md bg-neutral-100 p-3 text-xs text-neutral-800 dark:bg-neutral-800/30 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700">
               <p className="font-semibold mb-1">How it works:</p>
               <ul className="list-disc pl-4 space-y-1">
                 <li>Paste any standard Arduino sketch.</li>

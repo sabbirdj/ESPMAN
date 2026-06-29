@@ -38,7 +38,7 @@ export function StatsCards() {
       sub: `${online} online · ${updating} updating`,
       icon: Cpu,
       color: 'slate',
-      gradient: 'from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-400',
+      gradient: 'from-neutral-700 to-neutral-900 dark:from-neutral-200 dark:to-neutral-400',
     },
     {
       label: 'Online Now',
@@ -46,7 +46,7 @@ export function StatsCards() {
       sub: total > 0 ? `${Math.round((online / total) * 100)}% of fleet` : '—',
       icon: Activity,
       color: 'slate',
-      gradient: 'from-slate-600 to-slate-800 dark:from-slate-300 dark:to-slate-500',
+      gradient: 'from-neutral-600 to-neutral-800 dark:from-neutral-300 dark:to-neutral-500',
     },
     {
       label: 'Firmware Images',
@@ -54,7 +54,7 @@ export function StatsCards() {
       sub: stats ? `${stats.firmware.totalInstalls} installs` : 'loading…',
       icon: HardDrive,
       color: 'slate',
-      gradient: 'from-slate-500 to-slate-700 dark:from-slate-400 dark:to-slate-600',
+      gradient: 'from-neutral-500 to-neutral-700 dark:from-neutral-400 dark:to-neutral-600',
     },
     {
       label: 'Avg Wi-Fi Signal',
@@ -62,7 +62,7 @@ export function StatsCards() {
       sub: avgSignal ? `${avgSignal.label} · ${Math.round(avgRssi / Math.max(1, rssiCount))} dBm` : 'no devices',
       icon: Wifi,
       color: 'slate',
-      gradient: 'from-slate-400 to-slate-600 dark:from-slate-500 dark:to-slate-700',
+      gradient: 'from-neutral-400 to-neutral-600 dark:from-neutral-500 dark:to-neutral-700',
     },
   ]
 
@@ -73,17 +73,17 @@ export function StatsCards() {
         return (
           <Card
             key={card.label}
-            className="relative overflow-hidden border-slate-200 bg-white p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-950"
+            className="relative overflow-hidden border-neutral-200 bg-white p-5 transition-all duration-200 hover:-tranneutral-y-0.5 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-950"
           >
             <div className="flex items-start justify-between">
               <div className="flex flex-col">
-                <span className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                <span className="text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                   {card.label}
                 </span>
-                <span className="mt-2 text-3xl font-bold text-slate-900 dark:text-slate-50">
+                <span className="mt-2 text-3xl font-bold text-neutral-900 dark:text-neutral-50">
                   {card.value}
                 </span>
-                <span className="mt-1 text-xs text-slate-500 dark:text-slate-400">{card.sub}</span>
+                <span className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">{card.sub}</span>
               </div>
               <div className={`flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br ${card.gradient} text-white shadow-md`}>
                 <Icon className="h-5 w-5" />
@@ -96,13 +96,13 @@ export function StatsCards() {
       })}
 
       {error > 0 && (
-        <Card className="col-span-full flex items-center gap-3 border-slate-300 bg-slate-100 p-4 dark:border-slate-700 dark:bg-slate-800/40">
-          <AlertTriangle className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+        <Card className="col-span-full flex items-center gap-3 border-neutral-300 bg-neutral-100 p-4 dark:border-neutral-700 dark:bg-neutral-800/40">
+          <AlertTriangle className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
+            <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200">
               {error} device{error !== 1 ? 's' : ''} in error state
             </p>
-            <p className="text-xs text-slate-700 dark:text-slate-300">
+            <p className="text-xs text-neutral-700 dark:text-neutral-300">
               Check the activity log for details or attempt to reboot the affected devices.
             </p>
           </div>
@@ -116,8 +116,8 @@ export function StatsCardsSkeleton() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {[0, 1, 2, 3].map((i) => (
-        <Card key={i} className="flex h-32 items-center justify-center border-slate-200 dark:border-slate-800">
-          <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
+        <Card key={i} className="flex h-32 items-center justify-center border-neutral-200 dark:border-neutral-800">
+          <Loader2 className="h-5 w-5 animate-spin text-neutral-400" />
         </Card>
       ))}
     </div>

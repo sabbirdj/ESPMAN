@@ -127,7 +127,7 @@ export default function Home() {
     .slice(0, 8)
 
   return (
-    <div className="flex min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div className="flex min-h-screen bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
       <Sidebar activeView={view} onViewChange={setView} />
 
       <div className="flex min-w-0 flex-1 flex-col pb-16 md:pb-0">
@@ -148,17 +148,17 @@ export default function Home() {
               <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
                 <div className="xl:col-span-2">
                   <div className="mb-3 flex items-center justify-between">
-                    <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Recent Devices</h2>
+                    <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Recent Devices</h2>
                     <button
                       onClick={() => setView('devices')}
-                      className="text-xs font-medium text-slate-600 hover:text-slate-700 dark:text-slate-400"
+                      className="text-xs font-medium text-neutral-600 hover:text-neutral-700 dark:text-neutral-400"
                     >
                       View all →
                     </button>
                   </div>
                   {recentDevices.length === 0 ? (
-                    <Card className="flex h-32 items-center justify-center border-dashed border-slate-300 dark:border-slate-700">
-                      <span className="text-sm text-slate-400">No devices registered yet</span>
+                    <Card className="flex h-32 items-center justify-center border-dashed border-neutral-300 dark:border-neutral-700">
+                      <span className="text-sm text-neutral-400">No devices registered yet</span>
                     </Card>
                   ) : (
                     <div className="stagger-children grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -206,13 +206,13 @@ export default function Home() {
 
           {view === 'logs' && (
             <div className="animate-fade-in space-y-4">
-              <Card className="flex items-center gap-3 border-slate-200 bg-slate-100 p-4 dark:border-slate-700 dark:bg-slate-800/30">
-                <Radio className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+              <Card className="flex items-center gap-3 border-neutral-200 bg-neutral-100 p-4 dark:border-neutral-700 dark:bg-neutral-800/30">
+                <Radio className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
                 <div>
-                  <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                  <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200">
                     Live event stream active
                   </p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">
+                  <p className="text-xs text-neutral-600 dark:text-neutral-400">
                     Events from the device-service arrive in real time. Older events are persisted in the database and loaded on first visit.
                   </p>
                 </div>

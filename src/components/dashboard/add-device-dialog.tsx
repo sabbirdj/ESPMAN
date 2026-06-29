@@ -133,19 +133,19 @@ export function AddDeviceDialog({ open, onOpenChange, onDeviceAdded }: AddDevice
                     className={`flex flex-col items-center gap-1 rounded-lg border-2 px-2 py-2 transition-all ${
                       active
                         ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40'
-                        : 'border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700'
+                        : 'border-neutral-200 hover:border-neutral-300 dark:border-neutral-800 dark:hover:border-neutral-700'
                     }`}
                     style={active ? { borderColor: s.color } : undefined}
                   >
                     <div className="h-2 w-2 rounded-full" style={{ backgroundColor: s.color }} />
-                    <span className="text-[10px] font-medium leading-tight text-slate-700 dark:text-slate-300">{t.replace('ESP32-', '').replace('ESP', '')}</span>
+                    <span className="text-[10px] font-medium leading-tight text-neutral-700 dark:text-neutral-300">{t.replace('ESP32-', '').replace('ESP', '')}</span>
                   </button>
                 )
               })}
             </div>
             {spec && (
-              <div className="rounded-md bg-slate-50 p-2.5 text-[11px] text-slate-600 dark:bg-slate-900 dark:text-slate-400">
-                <span className="font-medium text-slate-800 dark:text-slate-200">{spec.label}: </span>
+              <div className="rounded-md bg-neutral-50 p-2.5 text-[11px] text-neutral-600 dark:bg-neutral-900 dark:text-neutral-400">
+                <span className="font-medium text-neutral-800 dark:text-neutral-200">{spec.label}: </span>
                 {spec.cpu} · {spec.ram} RAM · {spec.flash} Flash · {spec.wifi} · {spec.bluetooth} · {spec.pins} GPIO pins
               </div>
             )}

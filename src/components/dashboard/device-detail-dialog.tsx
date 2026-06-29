@@ -174,7 +174,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                       {device.type}
                     </Badge>
                     {device.isReal && (
-                      <Badge variant="outline" className="gap-1 text-[10px] border-slate-300 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">
+                      <Badge variant="outline" className="gap-1 text-[10px] border-neutral-300 bg-neutral-50 text-neutral-700 dark:border-neutral-800 dark:bg-neutral-950/40 dark:text-neutral-300">
                         <Usb className="h-2.5 w-2.5" />
                         ESP connected
                       </Badge>
@@ -202,7 +202,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                   size="sm"
                   onClick={handleFactoryReset}
                   disabled={resetting || isUpdating}
-                  className="h-8 text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                  className="h-8 text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900"
                 >
                   {resetting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCcw className="h-3.5 w-3.5" />}
                   Reset
@@ -212,7 +212,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                   size="icon"
                   onClick={handleDelete}
                   disabled={deleting}
-                  className="h-8 w-8 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  className="h-8 w-8 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
                 >
                   {deleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                 </Button>
@@ -220,22 +220,22 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
             </div>
           </DialogHeader>
 
-          <div className="flex border-b border-slate-200 px-6 dark:border-slate-800">
+          <div className="flex border-b border-neutral-200 px-6 dark:border-neutral-800">
             <button
               onClick={() => setActiveTab('telemetry')}
-              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'telemetry' ? 'border-slate-900 text-slate-900 dark:border-slate-100 dark:text-slate-100' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
+              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'telemetry' ? 'border-neutral-900 text-neutral-900 dark:border-neutral-100 dark:text-neutral-100' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300'}`}
             >
               <Signal className="h-4 w-4" /> Telemetry
             </button>
             <button
               onClick={() => setActiveTab('gpio')}
-              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'gpio' ? 'border-slate-900 text-slate-900 dark:border-slate-100 dark:text-slate-100' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
+              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'gpio' ? 'border-neutral-900 text-neutral-900 dark:border-neutral-100 dark:text-neutral-100' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300'}`}
             >
               <Power className="h-4 w-4" /> GPIO Control
             </button>
             <button
               onClick={() => setActiveTab('terminal')}
-              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'terminal' ? 'border-slate-900 text-slate-900 dark:border-slate-100 dark:text-slate-100' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
+              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'terminal' ? 'border-neutral-900 text-neutral-900 dark:border-neutral-100 dark:text-neutral-100' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300'}`}
             >
               <TerminalSquare className="h-4 w-4" /> Terminal
             </button>
@@ -260,7 +260,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                       <Meta label="GPIO Pins" value={`${spec?.pins ?? '—'} total`} />
                     </div>
                     {device.description && (
-                      <div className="mt-3 rounded-lg bg-slate-50 p-3 text-xs text-slate-600 dark:bg-slate-900 dark:text-slate-400">
+                      <div className="mt-3 rounded-lg bg-neutral-50 p-3 text-xs text-neutral-600 dark:bg-neutral-900 dark:text-neutral-400">
                         {device.description}
                       </div>
                     )}
@@ -312,7 +312,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                       </div>
 
                       {device.lastSeenAt && (
-                        <p className="mt-3 text-[11px] text-slate-400 dark:text-slate-500">
+                        <p className="mt-3 text-[11px] text-neutral-400 dark:text-neutral-500">
                           Last seen {new Date(device.lastSeenAt).toLocaleString()}
                         </p>
                       )}
@@ -325,7 +325,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
               {activeTab === 'gpio' && (
                 <section>
                   <SectionTitle icon={<Power className="h-3.5 w-3.5" />}>Full GPIO Control</SectionTitle>
-                  <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
+                  <p className="mb-3 text-xs text-neutral-500 dark:text-neutral-400">
                     Set pins to INPUT to read sensors, or OUTPUT to control relays.
                   </p>
                   {device.gpioState && Object.keys(device.gpioState).length > 0 ? (
@@ -338,17 +338,17 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                             key={pin}
                             className={`flex flex-col items-center gap-1.5 rounded-xl border-2 p-2.5 transition-all ${
                               on
-                                ? 'border-slate-900 bg-slate-100 dark:border-slate-200 dark:bg-slate-800'
-                                : 'border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900'
+                                ? 'border-neutral-900 bg-neutral-100 dark:border-neutral-200 dark:bg-neutral-800'
+                                : 'border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900'
                             }`}
                           >
-                            <span className="text-[10px] font-medium uppercase tracking-wide text-slate-400">GPIO {pin}</span>
+                            <span className="text-[10px] font-medium uppercase tracking-wide text-neutral-400">GPIO {pin}</span>
                             
                             {/* Mode Toggle Button */}
                             <button
                               onClick={() => handleSetPinMode(Number(pin), mode)}
                               disabled={isUpdating || isOffline}
-                              className="rounded bg-slate-200 px-1.5 py-0.5 text-[9px] font-bold text-slate-600 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                              className="rounded bg-neutral-200 px-1.5 py-0.5 text-[9px] font-bold text-neutral-600 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
                             >
                               {mode}
                             </button>
@@ -359,17 +359,17 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                               disabled={isUpdating || isOffline || !isOutput}
                               className={`mt-1 flex w-full flex-col items-center gap-1 rounded-md py-1.5 ${!isOutput ? 'cursor-not-allowed opacity-70' : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
                             >
-                              <span className={`text-lg font-black ${on ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500'}`}>
+                              <span className={`text-lg font-black ${on ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-400 dark:text-neutral-500'}`}>
                                 {on ? '1' : '0'}
                               </span>
-                              <div className={`h-1.5 w-full rounded-full ${on ? 'bg-slate-900 dark:bg-slate-100' : 'bg-slate-200 dark:bg-slate-700'}`} />
+                              <div className={`h-1.5 w-full rounded-full ${on ? 'bg-neutral-900 dark:bg-neutral-100' : 'bg-neutral-200 dark:bg-neutral-700'}`} />
                             </button>
                           </div>
                         )
                       })}
                     </div>
                   ) : (
-                    <div className="rounded-lg border border-dashed border-slate-200 p-4 text-center text-xs text-slate-400 dark:border-slate-700">
+                    <div className="rounded-lg border border-dashed border-neutral-200 p-4 text-center text-xs text-neutral-400 dark:border-neutral-700">
                       Waiting for GPIO state from ESP...
                     </div>
                   )}
@@ -378,9 +378,9 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
 
               {/* Terminal Tab */}
               {activeTab === 'terminal' && (
-                <section className="flex h-[55vh] flex-col overflow-hidden rounded-lg border border-slate-200 bg-slate-950 shadow-inner dark:border-slate-800">
-                  <div className="flex items-center justify-between bg-slate-900 px-3 py-2 border-b border-slate-800">
-                    <span className="flex items-center gap-2 text-xs font-medium text-slate-400">
+                <section className="flex h-[55vh] flex-col overflow-hidden rounded-lg border border-neutral-200 bg-neutral-950 shadow-inner dark:border-neutral-800">
+                  <div className="flex items-center justify-between bg-neutral-900 px-3 py-2 border-b border-neutral-800">
+                    <span className="flex items-center gap-2 text-xs font-medium text-neutral-400">
                       <TerminalSquare className="h-4 w-4" /> Serial Monitor
                     </span>
                     <span className="text-[10px] text-emerald-500">Connected to /dev/ttyUSB0</span>
@@ -389,31 +389,31 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                     <div className="space-y-1.5 font-mono text-xs">
                       {deviceLogs.slice().reverse().map((log) => (
                         <div key={log.id} className="flex gap-3">
-                          <span className="shrink-0 text-slate-600">[{new Date(log.createdAt).toLocaleTimeString()}]</span>
+                          <span className="shrink-0 text-neutral-600">[{new Date(log.createdAt).toLocaleTimeString()}]</span>
                           <span className={
                             log.level === 'error' ? 'text-rose-400' :
                             log.level === 'warn' ? 'text-amber-400' :
                             log.level === 'success' ? 'text-emerald-400' :
-                            'text-slate-300'
+                            'text-neutral-300'
                           }>
                             {log.event === 'command' ? '> ' : ''}{log.message}
                           </span>
                         </div>
                       ))}
                       {deviceLogs.length === 0 && (
-                        <div className="text-slate-600">Waiting for serial output...</div>
+                        <div className="text-neutral-600">Waiting for serial output...</div>
                       )}
                     </div>
                   </ScrollArea>
-                  <div className="flex bg-slate-900 p-2 border-t border-slate-800">
-                    <div className="flex w-full items-center gap-2 rounded bg-black px-2 ring-1 ring-slate-800 focus-within:ring-emerald-500">
+                  <div className="flex bg-neutral-900 p-2 border-t border-neutral-800">
+                    <div className="flex w-full items-center gap-2 rounded bg-black px-2 ring-1 ring-neutral-800 focus-within:ring-emerald-500">
                       <span className="font-mono text-emerald-500">$</span>
                       <Input
                         value={command}
                         onChange={(e) => setCommand(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter') handleSendCommand() }}
                         placeholder="Type a command (e.g. sys.info)..."
-                        className="h-8 border-0 bg-transparent p-0 font-mono text-xs text-slate-200 placeholder:text-slate-600 focus-visible:ring-0"
+                        className="h-8 border-0 bg-transparent p-0 font-mono text-xs text-neutral-200 placeholder:text-neutral-600 focus-visible:ring-0"
                         disabled={isUpdating || isOffline}
                         autoFocus
                       />
@@ -445,12 +445,12 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
               )}
 
               {isOffline && activeTab === 'telemetry' && (
-                <section className="rounded-lg bg-slate-50 p-4 dark:bg-slate-900">
-                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                <section className="rounded-lg bg-neutral-50 p-4 dark:bg-neutral-900">
+                  <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-300">
                     <AlertTriangle className="h-4 w-4" />
                     <span className="text-sm font-medium">Device is offline</span>
                   </div>
-                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
                     {device.lastSeenAt
                       ? `Last seen ${new Date(device.lastSeenAt).toLocaleString()}`
                       : 'Device has not yet reported to the dashboard.'}
@@ -467,8 +467,8 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
 
 function SectionTitle({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <h3 className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-      <span className="text-slate-400">{icon}</span>
+    <h3 className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+      <span className="text-neutral-400">{icon}</span>
       {children}
     </h3>
   )
@@ -476,9 +476,9 @@ function SectionTitle({ icon, children }: { icon: React.ReactNode; children: Rea
 
 function Meta({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
-    <div className="rounded-lg bg-slate-50 p-2.5 dark:bg-slate-900">
-      <div className="text-[10px] font-medium uppercase tracking-wide text-slate-400">{label}</div>
-      <div className={`mt-0.5 truncate text-xs text-slate-700 dark:text-slate-300 ${mono ? 'font-mono' : ''}`} title={value}>
+    <div className="rounded-lg bg-neutral-50 p-2.5 dark:bg-neutral-900">
+      <div className="text-[10px] font-medium uppercase tracking-wide text-neutral-400">{label}</div>
+      <div className={`mt-0.5 truncate text-xs text-neutral-700 dark:text-neutral-300 ${mono ? 'font-mono' : ''}`} title={value}>
         {value}
       </div>
     </div>
@@ -502,16 +502,16 @@ function Metric({
     ok: 'text-emerald-600',
     warn: 'text-amber-600',
     danger: 'text-rose-600',
-    neutral: 'text-slate-700 dark:text-slate-300',
+    neutral: 'text-neutral-700 dark:text-neutral-300',
   }[tone]
   return (
-    <div className="rounded-lg border border-slate-100 bg-white p-3 dark:border-slate-800 dark:bg-slate-950">
-      <div className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wide text-slate-400">
+    <div className="rounded-lg border border-neutral-100 bg-white p-3 dark:border-neutral-800 dark:bg-neutral-950">
+      <div className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wide text-neutral-400">
         {icon}
         {label}
       </div>
       <div className={`mt-1 text-lg font-bold ${toneClass}`}>{value}</div>
-      {sub && <div className="text-[10px] text-slate-400">{sub}</div>}
+      {sub && <div className="text-[10px] text-neutral-400">{sub}</div>}
     </div>
   )
 }
@@ -522,17 +522,17 @@ function StorageBar({
   const pct = used != null && total ? Math.min(100, Math.round((used / total) * 100)) : 0
   const tone = pct > 85 ? 'bg-rose-500' : pct > 65 ? 'bg-amber-500' : 'bg-emerald-500'
   return (
-    <div className="rounded-lg border border-slate-100 bg-white p-3 dark:border-slate-800 dark:bg-slate-950">
+    <div className="rounded-lg border border-neutral-100 bg-white p-3 dark:border-neutral-800 dark:bg-neutral-950">
       <div className="flex items-center justify-between text-xs">
-        <span className="flex items-center gap-1.5 font-medium text-slate-600 dark:text-slate-300">
+        <span className="flex items-center gap-1.5 font-medium text-neutral-600 dark:text-neutral-300">
           {icon}
           {label}
         </span>
-        <span className="text-slate-500 dark:text-slate-400">
+        <span className="text-neutral-500 dark:text-neutral-400">
           {used != null ? formatBytes(used) : '—'} / {total ? formatBytes(total) : '—'}
         </span>
       </div>
-      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
         <div className={`h-full rounded-full ${tone}`} style={{ width: `${pct}%` }} />
       </div>
     </div>
@@ -542,7 +542,7 @@ function StorageBar({
 function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { label: string; cls: string }> = {
     online:   { label: 'Online',   cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' },
-    offline:  { label: 'Offline',  cls: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400' },
+    offline:  { label: 'Offline',  cls: 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400' },
     updating: { label: 'Updating', cls: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' },
     error:    { label: 'Error',    cls: 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300' },
   }
