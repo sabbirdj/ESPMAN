@@ -37,7 +37,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Missing parameters' }, { status: 400 })
   }
 
-  const fqbn = chipType === 'ESP32' ? 'esp32:esp32:esp32' : 'esp8266:esp8266:esp8266'
+  let fqbn = 'esp32:esp32:esp32'
+  if (chipType === 'ESP8266') fqbn = 'esp8266:esp8266:esp8266'
+  else if (chipType === 'ESP32-S2') fqbn = 'esp32:esp32:esp32s2'
+  else if (chipType === 'ESP32-S3') fqbn = 'esp32:esp32:esp32s3'
+  else if (chipType === 'ESP32-C3') fqbn = 'esp32:esp32:esp32c3'
+  else if (chipType === 'ESP32-C6') fqbn = 'esp32:esp32:esp32c6'
   
   async function* compileGenerator() {
     yield `Starting compilation for ${name} v${version} on ${chipType}...`

@@ -254,8 +254,12 @@ export function CloudCompiler() {
                   onChange={(e) => setChipType(e.target.value)}
                   className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
                 >
-                  <option value="ESP32">ESP32</option>
+                  <option value="ESP32">ESP32 (Standard)</option>
                   <option value="ESP8266">ESP8266</option>
+                  <option value="ESP32-S2">ESP32-S2</option>
+                  <option value="ESP32-S3">ESP32-S3</option>
+                  <option value="ESP32-C3">ESP32-C3</option>
+                  <option value="ESP32-C6">ESP32-C6</option>
                 </select>
               </div>
 
