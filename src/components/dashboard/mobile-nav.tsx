@@ -1,10 +1,10 @@
 'use client'
 
-import { Cpu, LayoutDashboard, MemoryStick, Radio } from 'lucide-react'
+import { Cpu, LayoutDashboard, MemoryStick, Radio, Code } from 'lucide-react'
 
 interface MobileNavProps {
-  activeView: 'dashboard' | 'devices' | 'firmware' | 'logs'
-  onViewChange: (view: 'dashboard' | 'devices' | 'firmware' | 'logs') => void
+  activeView: 'dashboard' | 'devices' | 'firmware' | 'compiler' | 'logs'
+  onViewChange: (view: 'dashboard' | 'devices' | 'firmware' | 'compiler' | 'logs') => void
 }
 
 export function MobileNav({ activeView, onViewChange }: MobileNavProps) {
@@ -12,6 +12,7 @@ export function MobileNav({ activeView, onViewChange }: MobileNavProps) {
     { id: 'dashboard' as const, label: 'Overview', icon: LayoutDashboard },
     { id: 'devices' as const, label: 'Devices', icon: Cpu },
     { id: 'firmware' as const, label: 'Firmware', icon: MemoryStick },
+    { id: 'compiler' as const, label: 'Compiler', icon: Code },
     { id: 'logs' as const, label: 'Logs', icon: Radio },
   ]
   return (

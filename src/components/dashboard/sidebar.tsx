@@ -1,11 +1,11 @@
 'use client'
 
-import { Cpu, LayoutDashboard, MemoryStick, Radio, Settings, Wifi } from 'lucide-react'
+import { Cpu, LayoutDashboard, MemoryStick, Radio, Settings, Wifi, Code } from 'lucide-react'
 import { useDashboardStore } from '@/lib/store'
 
 interface SidebarProps {
-  activeView: 'dashboard' | 'devices' | 'firmware' | 'logs'
-  onViewChange: (view: 'dashboard' | 'devices' | 'firmware' | 'logs') => void
+  activeView: 'dashboard' | 'devices' | 'firmware' | 'compiler' | 'logs'
+  onViewChange: (view: 'dashboard' | 'devices' | 'firmware' | 'compiler' | 'logs') => void
 }
 
 export function Sidebar({ activeView, onViewChange }: SidebarProps) {
@@ -19,6 +19,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
     { id: 'dashboard' as const, label: 'Overview', icon: LayoutDashboard },
     { id: 'devices' as const, label: 'Devices', icon: Cpu, badge: `${onlineCount}/${totalCount}` },
     { id: 'firmware' as const, label: 'Firmware', icon: MemoryStick },
+    { id: 'compiler' as const, label: 'Cloud Compiler', icon: Code },
     { id: 'logs' as const, label: 'Activity Log', icon: Radio },
   ]
 

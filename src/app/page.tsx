@@ -10,6 +10,7 @@ import { DeviceCard } from '@/components/dashboard/device-card'
 import { AddDeviceDialog } from '@/components/dashboard/add-device-dialog'
 import { DeviceDetailDialog } from '@/components/dashboard/device-detail-dialog'
 import { FirmwareManager } from '@/components/dashboard/firmware-manager'
+import { CloudCompiler } from '@/components/dashboard/cloud-compiler'
 import { ActivityLog } from '@/components/dashboard/activity-log'
 import { FleetBreakdown } from '@/components/dashboard/fleet-breakdown'
 import { useDeviceSocket, useDeviceSocketEmitter } from '@/hooks/use-device-socket'
@@ -18,7 +19,7 @@ import { toast } from 'sonner'
 import { Radio } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 
-type View = 'dashboard' | 'devices' | 'firmware' | 'logs'
+type View = 'dashboard' | 'devices' | 'firmware' | 'compiler' | 'logs'
 
 export default function Home() {
   useDeviceSocket()
@@ -112,6 +113,7 @@ export default function Home() {
     dashboard: { title: 'Dashboard', subtitle: 'Real-time overview of your ESP fleet', showAdd: true },
     devices:   { title: 'Devices',   subtitle: 'Manage and control all registered ESP devices', showAdd: true },
     firmware:  { title: 'Firmware',  subtitle: 'Upload and distribute firmware to your devices', showAdd: false },
+    compiler:  { title: 'Cloud Compiler', subtitle: 'Write code and compile firmware remotely', showAdd: false },
     logs:      { title: 'Activity Log', subtitle: 'Audit trail of all device events and commands', showAdd: false },
   }
 
@@ -192,6 +194,10 @@ export default function Home() {
 
           {view === 'firmware' && (
             <FirmwareManager />
+          )}
+
+          {view === 'compiler' && (
+            <CloudCompiler />
           )}
 
           {view === 'logs' && (

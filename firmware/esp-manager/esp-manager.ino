@@ -87,8 +87,8 @@ const uint16_t SERVER_PORT   = 3004;
 const uint16_t HTTP_PORT     = 3000;
 
 // How this device appears in the dashboard
-const char* DEVICE_NAME      = "My ESP Device";
-const char* FIRMWARE_VERSION = "2.0.0";
+const char* DEVICE_NAME      = "ESP32 V1";
+const char* FIRMWARE_VERSION = "2.0.1";
 
 // Set to true if your server uses HTTPS/wss
 const bool USE_SSL           = false;
@@ -102,6 +102,7 @@ unsigned long lastTelemetry = 0;
 unsigned long bootTime = millis();
 unsigned long lastWifiCheck = 0;
 bool wsConnected = false;
+bool otaInProgress = false;
 bool pinState[64] = {false};
 String pinModes[64]; // Stores "INPUT", "OUTPUT", "INPUT_PULLUP"
 
@@ -185,7 +186,9 @@ void connectWebSocket() {
 // ============================================================================
 
 void loop() {
-  webSocket.loop();
+  if (!otaInProgress) {
+    webSocket.loop();
+  }
 
   // Check Wi-Fi every 10 seconds, reconnect if needed
   if (millis() - lastWifiCheck >= 10000UL) {
@@ -381,7 +384,6 @@ void handleServerMessage(const char* jsonStr) {
     const char* command = doc["command"] | "";
     Serial.printf("[cmd] serial: %s\n", command);
     handleSerialCommand(String(command));
-    sendAck("command", "ok", "Command executed");
   }
   else {
     Serial.printf("[cmd] unknown type: %s\n", cmdType);
@@ -390,39 +392,41 @@ void handleServerMessage(const char* jsonStr) {
 
 void handleSerialCommand(String command) {
   command.trim();
+  String output = "";
+  
   if (command == "sys.info") {
-    Serial.printf("Chip=%s MAC=%s IP=%s Heap=%u Uptime=%lus\n",
-      CHIP_TYPE,
-      WiFi.macAddress().c_str(),
-      WiFi.localIP().toString().c_str(),
-      (unsigned)ESP_FREE_HEAP,
-      (unsigned long)((millis() - bootTime) / 1000));
+    output = "Chip=" + String(CHIP_TYPE) + 
+             " MAC=" + WiFi.macAddress() + 
+             " IP=" + WiFi.localIP().toString() + 
+             " Heap=" + String((unsigned)ESP_FREE_HEAP) + 
+             " Uptime=" + String((unsigned long)((millis() - bootTime) / 1000)) + "s";
   } else if (command == "wifi.scan") {
-    Serial.println(F("Scanning Wi-Fi networks..."));
     int n = WiFi.scanNetworks();
+    output = "Scanned Wi-Fi networks:\n";
     for (int i = 0; i < n; i++) {
-      Serial.printf("  %s (%d dBm) %s\n",
-        WiFi.SSID(i).c_str(),
-        WiFi.RSSI(i),
-        WiFi.encryptionType(i) == WIFI_AUTH_OPEN ? "[open]" : "[encrypted]");
+      output += "  " + WiFi.SSID(i) + " (" + String(WiFi.RSSI(i)) + " dBm) " + 
+                (WiFi.encryptionType(i) == WIFI_AUTH_OPEN ? "[open]" : "[encrypted]") + "\n";
     }
   } else if (command == "gpio.read") {
-    Serial.println(F("GPIO states:"));
+    output = "GPIO states:\n";
     for (int i = 0; i < PIN_COUNT; i++) {
       int pin = DEFAULT_PINS[i];
-      Serial.printf("  GPIO %d (%s): %s\n", pin, pinModes[pin].c_str(), digitalRead(pin) ? "HIGH" : "LOW");
+      output += "  GPIO " + String(pin) + " (" + pinModes[pin] + "): " + (digitalRead(pin) ? "HIGH" : "LOW") + "\n";
     }
   } else if (command == "wifi.reconnect") {
-    Serial.println(F("Reconnecting Wi-Fi..."));
+    output = "Reconnecting Wi-Fi...";
     WiFi.disconnect();
     delay(1000);
     connectWifi();
   } else {
-    Serial.printf("[serial] unknown command: %s\n", command.c_str());
-    sendAck("command", "error", String("Unknown command: " + command).c_str());
+    output = "Unknown command: " + command;
+    Serial.printf("[serial] %s\n", output.c_str());
+    sendAck("command", "error", output.c_str());
     return;
   }
-  sendAck("command", "ok", String("Executed: " + command).c_str());
+  
+  Serial.printf("[serial] %s\n", output.c_str());
+  sendAck("command", "ok", output.c_str());
 }
 
 // ============================================================================
@@ -436,35 +440,49 @@ void performOTA(String path, String version) {
   // Construct the download URL using the known server host + HTTP port
   String url = "http://" + String(SERVER_HOST) + ":" + String(HTTP_PORT) + path;
   Serial.printf("Starting OTA update from: %s\n", url.c_str());
+  
+  otaInProgress = true;
+  webSocket.disconnect(); // Disable WS to free memory for OTA
+  delay(100);
 
   #ifdef ESP8266
     WiFiClient client;
+    ESPhttpUpdate.rebootOnUpdate(true);
     t_httpUpdate_return ret = ESPhttpUpdate.update(client, url);
   #else
     WiFiClient client;
+    httpUpdate.rebootOnUpdate(true);
     t_httpUpdate_return ret = httpUpdate.update(client, url);
   #endif
 
   switch (ret) {
-    case HTTP_UPDATE_FAILED:
-      Serial.printf("OTA FAILED (error %d): %s\n",
-        #ifdef ESP8266
-          ESPhttpUpdate.getLastError(),
-          ESPhttpUpdate.getLastErrorString().c_str()
-        #else
-          httpUpdate.getLastError(),
-          httpUpdate.getLastErrorString().c_str()
-        #endif
-      );
-      sendAck("ota", "error", "OTA update failed");
+    case HTTP_UPDATE_FAILED: {
+      String errStr;
+      #ifdef ESP8266
+        errStr = ESPhttpUpdate.getLastErrorString();
+      #else
+        errStr = httpUpdate.getLastErrorString();
+      #endif
+      Serial.printf("OTA FAILED: %s\n", errStr.c_str());
+      
+      // Re-enable WS to report error
+      otaInProgress = false;
+      webSocket.begin(SERVER_HOST, SERVER_PORT, "/");
+      delay(1000);
+      sendAck("ota", "error", ("OTA update failed: " + errStr).c_str());
       break;
+    }
     case HTTP_UPDATE_NO_UPDATES:
-      Serial.println(F("OTA: no updates available"));
-      sendAck("ota", "error", "No updates available");
+      Serial.println("OTA: No updates");
+      otaInProgress = false;
+      webSocket.begin(SERVER_HOST, SERVER_PORT, "/");
+      delay(1000);
+      sendAck("ota", "error", "No updates found");
       break;
     case HTTP_UPDATE_OK:
       Serial.println(F("OTA: success — rebooting with new firmware"));
-      // ESP automatically reboots after successful OTA
+      delay(100);
+      ESP_RESTART;
       break;
   }
 }
