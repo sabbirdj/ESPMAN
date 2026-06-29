@@ -47,47 +47,13 @@ export async function POST(req: Request) {
     await fs.mkdir(tmpDir, { recursive: true })
     
     try {
-      // 1. Read the ESPMAN core boilerplate
-      yield 'Reading ESPMAN core...'
-      const corePath = path.join(process.cwd(), 'firmware', 'esp-manager', 'esp-manager.ino')
-      let coreCode = await fs.readFile(corePath, 'utf8')
+      // 1. Process user code directly (no merging required)
+      yield 'Processing firmware code...'
       
-      // Rename core setup/loop
-      coreCode = coreCode.replace(/\bvoid\s+setup\s*\(\s*\)/g, 'void espman_setup()')
-      coreCode = coreCode.replace(/\bvoid\s+loop\s*\(\s*\)/g, 'void espman_loop()')
-      
-      // 2. Process user code
-      yield 'Injecting user code...'
-      let userCode = code
-      userCode = userCode.replace(/\bvoid\s+setup\s*\(\s*\)/g, 'void user_setup()')
-      userCode = userCode.replace(/\bvoid\s+loop\s*\(\s*\)/g, 'void user_loop()')
-      
-      // 3. Merge them with master setup/loop
-      const mergedCode = `
-${coreCode}
-
-// ==========================================
-// USER CODE INJECTED BELOW
-// ==========================================
-${userCode}
-
-// ==========================================
-// MASTER WRAPPER
-// ==========================================
-void setup() {
-  espman_setup();
-  user_setup();
-}
-
-void loop() {
-  espman_loop();
-  user_loop();
-}
-`
-      // Write merged code to temp dir
+      // Write code to temp dir
       const sketchFile = path.join(tmpDir, `${path.basename(tmpDir)}.ino`)
-      await fs.writeFile(sketchFile, mergedCode)
-      yield 'Code merged and saved. Invoking compiler...'
+      await fs.writeFile(sketchFile, code)
+      yield 'Code saved. Invoking compiler...'
 
       // 4. Compile with arduino-cli
       // Note: arduino-cli must be in PATH. We use ~/.local/bin/arduino-cli for ubuntu VPS

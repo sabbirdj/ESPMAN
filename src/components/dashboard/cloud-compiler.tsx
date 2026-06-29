@@ -8,13 +8,21 @@ import { toast } from 'sonner'
 import { useRouter } from 'navigation'
 
 export function CloudCompiler() {
-  const [code, setCode] = useState<string>('void setup() {\n  // Your setup code here, to run once:\n  \n}\n\nvoid loop() {\n  // Your main code here, to run repeatedly:\n  \n}')
+  const [code, setCode] = useState<string>('// Loading ESPMAN firmware template...')
   const [name, setName] = useState('MyCustomFirmware')
   const [version, setVersion] = useState('1.0.0')
   const [chipType, setChipType] = useState('ESP32')
   const [isCompiling, setIsCompiling] = useState(false)
   const [logs, setLogs] = useState<string[]>([])
   const terminalRef = useRef<HTMLDivElement>(null)
+
+  // Load base firmware on mount
+  useEffect(() => {
+    fetch('/api/compiler/template')
+      .then(res => res.text())
+      .then(text => setCode(text))
+      .catch(() => setCode('// Failed to load template'))
+  }, [])
 
   // Auto-scroll terminal
   useEffect(() => {
@@ -89,7 +97,7 @@ export function CloudCompiler() {
               Arduino Editor
             </div>
             <div className="text-xs text-slate-500">
-              ESPMAN Core injected automatically
+              Full Firmware Source Code
             </div>
           </div>
           <div className="h-[500px] w-full">
@@ -198,8 +206,8 @@ export function CloudCompiler() {
             <div className="mt-4 rounded-md bg-emerald-50 p-3 text-xs text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200 border border-emerald-100 dark:border-emerald-800">
               <p className="font-semibold mb-1">How it works:</p>
               <ul className="list-disc pl-4 space-y-1">
-                <li>Write standard Arduino code above.</li>
-                <li>ESPMAN framework is automatically injected during compilation.</li>
+                <li>The editor loads your full ESP firmware code.</li>
+                <li>Add your custom sensors/logic directly.</li>
                 <li>The resulting binary is saved to your OTA registry.</li>
                 <li>Deploy to any device instantly!</li>
               </ul>
