@@ -1,9 +1,11 @@
 'use client'
 
-import { Activity, Bell, Plus, Search } from 'lucide-react'
+import { Activity, Bell, Moon, Plus, Search, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useDashboardStore } from '@/lib/store'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
 
 interface HeaderProps {
   title: string
@@ -25,6 +27,9 @@ export function Header({
   const devices = useDashboardStore((s) => s.devices)
   const onlineCount = devices.filter((d) => d.status === 'online').length
   const updatingCount = devices.filter((d) => d.status === 'updating').length
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-slate-200 bg-white/80 px-4 backdrop-blur-md md:px-6 dark:border-slate-800 dark:bg-slate-950/80">
@@ -53,6 +58,23 @@ export function Header({
           {onlineCount} online{updatingCount > 0 ? ` · ${updatingCount} updating` : ''}
         </span>
       </div>
+
+      {/* Theme toggle */}
+      {mounted && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          className="transition-all duration-200"
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {theme === 'dark' ? (
+            <Sun className="h-4 w-4 text-amber-400" />
+          ) : (
+            <Moon className="h-4 w-4 text-slate-600" />
+          )}
+        </Button>
+      )}
 
       <Button variant="ghost" size="icon" className="relative">
         <Bell className="h-4 w-4" />
