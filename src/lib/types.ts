@@ -27,12 +27,12 @@ export const ESP_TYPE_SPECS: Record<EspType, {
   pins: number
   color: string
 }> = {
-  'ESP8266':  { label: 'ESP8266',   cpu: 'Tensica L106 80MHz',  flash: '4 MB',   ram: '50 KB',  wifi: '2.4 GHz b/g/n', bluetooth: 'No',            pins: 11, color: '#f59e0b' },
-  'ESP32':    { label: 'ESP32',     cpu: 'Xtensa LX6 240MHz',   flash: '4 MB',   ram: '520 KB', wifi: '2.4 GHz b/g/n', bluetooth: 'BLE 4.2',       pins: 34, color: '#10b981' },
-  'ESP32-S2': { label: 'ESP32-S2',  cpu: 'Xtensa LX7 240MHz',   flash: '4 MB',   ram: '320 KB', wifi: '2.4 GHz b/g/n', bluetooth: 'No',            pins: 43, color: '#06b6d4' },
-  'ESP32-S3': { label: 'ESP32-S3',  cpu: 'Xtensa LX7 240MHz',   flash: '8 MB',   ram: '512 KB', wifi: '2.4 GHz b/g/n', bluetooth: 'BLE 5.0',       pins: 45, color: '#ec4899' },
-  'ESP32-C3': { label: 'ESP32-C3',  cpu: 'RISC-V 160MHz',       flash: '4 MB',   ram: '400 KB', wifi: '2.4 GHz b/g/n', bluetooth: 'BLE 5.0',       pins: 22, color: '#8b5cf6' },
-  'ESP32-C6': { label: 'ESP32-C6',  cpu: 'RISC-V 160MHz',       flash: '4 MB',   ram: '512 KB', wifi: 'Wi-Fi 6 (ax)',  bluetooth: 'BLE 5.3 + Zigbee', pins: 30, color: '#ef4444' },
+  'ESP8266':  { label: 'ESP8266',   cpu: 'Tensica L106 80MHz',  flash: '4 MB',   ram: '50 KB',  wifi: '2.4 GHz b/g/n', bluetooth: 'No',            pins: 11, color: '#94a3b8' },
+  'ESP32':    { label: 'ESP32',     cpu: 'Xtensa LX6 240MHz',   flash: '4 MB',   ram: '520 KB', wifi: '2.4 GHz b/g/n', bluetooth: 'BLE 4.2',       pins: 34, color: '#64748b' },
+  'ESP32-S2': { label: 'ESP32-S2',  cpu: 'Xtensa LX7 240MHz',   flash: '4 MB',   ram: '320 KB', wifi: '2.4 GHz b/g/n', bluetooth: 'No',            pins: 43, color: '#475569' },
+  'ESP32-S3': { label: 'ESP32-S3',  cpu: 'Xtensa LX7 240MHz',   flash: '8 MB',   ram: '512 KB', wifi: '2.4 GHz b/g/n', bluetooth: 'BLE 5.0',       pins: 45, color: '#334155' },
+  'ESP32-C3': { label: 'ESP32-C3',  cpu: 'RISC-V 160MHz',       flash: '4 MB',   ram: '400 KB', wifi: '2.4 GHz b/g/n', bluetooth: 'BLE 5.0',       pins: 22, color: '#1e293b' },
+  'ESP32-C6': { label: 'ESP32-C6',  cpu: 'RISC-V 160MHz',       flash: '4 MB',   ram: '512 KB', wifi: 'Wi-Fi 6 (ax)',  bluetooth: 'BLE 5.3 + Zigbee', pins: 30, color: '#0f172a' },
 }
 
 export type DeviceStatus = 'online' | 'offline' | 'updating' | 'error'

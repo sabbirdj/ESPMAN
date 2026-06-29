@@ -56,7 +56,7 @@ export function DeviceCard({ device, onSelect, onReboot }: DeviceCardProps) {
       {/* Top accent strip — colored by device type */}
       <div
         className="h-1 w-full"
-        style={{ backgroundColor: spec?.color ?? '#10b981' }}
+        style={{ backgroundColor: spec?.color ?? '#64748b' }}
       />
 
       <div className="p-5">
@@ -65,7 +65,7 @@ export function DeviceCard({ device, onSelect, onReboot }: DeviceCardProps) {
           <div className="flex items-start gap-3">
             <div
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white shadow-sm"
-              style={{ backgroundColor: spec?.color ?? '#10b981' }}
+              style={{ backgroundColor: spec?.color ?? '#64748b' }}
             >
               <Cpu className="h-5 w-5" />
             </div>
