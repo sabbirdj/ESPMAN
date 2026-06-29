@@ -407,16 +407,54 @@ void ESPManager::performOTA(String path, String version) {
   Serial.printf("Starting OTA update from: %s\n", url.c_str());
   
   otaInProgress = true;
-  webSocket.disconnect();
+  // We keep the webSocket connected so we can stream progress
   delay(100);
 
   #ifdef ESP8266
     WiFiClient client;
     ESPhttpUpdate.rebootOnUpdate(true);
+    
+    ESPhttpUpdate.onProgress([](int current, int total) {
+      if (_instance && total > 0) {
+        int progress = (current * 100) / total;
+        static int lastProgress = -1;
+        if (progress - lastProgress >= 5 || progress == 100) {
+          lastProgress = progress;
+          JsonDocument doc;
+          doc["type"] = "ota_progress";
+          doc["mac"] = WiFi.macAddress();
+          doc["progress"] = progress;
+          String json;
+          serializeJson(doc, json);
+          _instance->webSocket.sendTXT(json);
+          _instance->webSocket.loop(); // Process immediately
+        }
+      }
+    });
+    
     t_httpUpdate_return ret = ESPhttpUpdate.update(client, url);
   #else
     WiFiClient client;
     httpUpdate.rebootOnUpdate(true);
+    
+    httpUpdate.onProgress([](int current, int total) {
+      if (_instance && total > 0) {
+        int progress = (current * 100) / total;
+        static int lastProgress = -1;
+        if (progress - lastProgress >= 5 || progress == 100) {
+          lastProgress = progress;
+          JsonDocument doc;
+          doc["type"] = "ota_progress";
+          doc["mac"] = WiFi.macAddress();
+          doc["progress"] = progress;
+          String json;
+          serializeJson(doc, json);
+          _instance->webSocket.sendTXT(json);
+          _instance->webSocket.loop(); // Process immediately
+        }
+      }
+    });
+    
     t_httpUpdate_return ret = httpUpdate.update(client, url);
   #endif
 

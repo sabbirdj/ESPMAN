@@ -65,6 +65,7 @@ export interface DeviceLiveState {
   ipAddress?: string
   macAddress: string
   lastSeenAt: string
+  installProgress?: number
 }
 
 export interface LogEntry {

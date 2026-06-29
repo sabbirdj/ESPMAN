@@ -44,6 +44,7 @@ interface DeviceShadow {
   gpioMode: Record<string, string> | null
   lastSeenAt: string | null
   isReal: boolean
+  installProgress?: number | null
 }
 
 interface DashboardClient {
@@ -102,6 +103,7 @@ function createRealDeviceShadow(opts: {
     gpioState: initialGpio,
     lastSeenAt: new Date().toISOString(),
     isReal: true,
+    installProgress: null,
   }
 }
 
@@ -403,6 +405,8 @@ espWss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
       })
     } else if (type === 'telemetry') {
       handleEspTelemetry(msg)
+    } else if (type === 'ota_progress') {
+      handleEspOtaProgress(msg)
     } else if (type === 'ack') {
       handleEspAck(msg)
     } else {
@@ -549,6 +553,26 @@ function handleEspTelemetry(msg: any) {
   })
 }
 
+// Handle OTA progress from a real ESP
+function handleEspOtaProgress(msg: any) {
+  const mac = String(msg.mac ?? '').toUpperCase()
+  if (!mac) return
+  const device = findDeviceByMac(mac)
+  if (!device) return
+  
+  const progress = Number(msg.progress)
+  if (!isNaN(progress)) {
+    device.installProgress = progress
+    broadcast('device:update', {
+      id: device.id,
+      changes: {
+        installProgress: progress
+      }
+    })
+    console.log(`[esp-bridge] OTA progress for ${mac}: ${progress}%`)
+  }
+}
+
 // Handle acknowledgment from a real ESP (confirms command was received)
 function handleEspAck(msg: any) {
   const mac = String(msg.mac ?? '').toUpperCase()
@@ -616,6 +640,7 @@ async function loadExistingDevicesFromDb() {
           gpioMode: null,
           lastSeenAt: null,
           isReal: false,
+          installProgress: null,
         }
         devices.set(d.id, shadow)
       }
