@@ -14,6 +14,7 @@ export function CloudCompiler() {
   const [name, setName] = useState('MyCustomFirmware')
   const [version, setVersion] = useState('1.0.0')
   const [chipType, setChipType] = useState('ESP32')
+  const [dependencies, setDependencies] = useState('')
   
   // Hardware Config
   const [wifiSsid, setWifiSsid] = useState('')
@@ -118,7 +119,8 @@ export function CloudCompiler() {
           chipType,
           wifiSsid,
           wifiPassword,
-          serverHost
+          serverHost,
+          dependencies
         })
       })
 
@@ -255,6 +257,18 @@ export function CloudCompiler() {
                   <option value="ESP32">ESP32</option>
                   <option value="ESP8266">ESP8266</option>
                 </select>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-slate-500">Library Dependencies</label>
+                <input
+                  type="text"
+                  placeholder="e.g. DHT sensor library, Adafruit NeoPixel"
+                  value={dependencies}
+                  onChange={(e) => setDependencies(e.target.value)}
+                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                />
+                <p className="mt-1 text-[10px] text-slate-500">Comma-separated exact library names.</p>
               </div>
 
               <div className="pt-2">

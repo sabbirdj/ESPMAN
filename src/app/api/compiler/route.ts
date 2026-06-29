@@ -31,7 +31,7 @@ function streamResponse(iterator: AsyncGenerator<string>) {
 }
 
 export async function POST(req: Request) {
-  const { code, name, version, chipType, wifiSsid, wifiPassword, serverHost } = await req.json()
+  const { code, name, version, chipType, wifiSsid, wifiPassword, serverHost, dependencies } = await req.json()
 
   if (!code || !name || !version || !chipType) {
     return NextResponse.json({ error: 'Missing parameters' }, { status: 400 })
@@ -111,13 +111,41 @@ void loop() {
       await fs.copyFile(path.join(libPath, 'ESPMAN.h'), path.join(tmpDir, 'ESPMAN.h'))
       await fs.copyFile(path.join(libPath, 'ESPMAN.cpp'), path.join(tmpDir, 'ESPMAN.cpp'))
 
+      const arduinoCliPath = process.env.NODE_ENV === 'production' 
+        ? '/home/ubuntu/.local/bin/arduino-cli'
+        : 'arduino-cli'
+
+      // 3. Install dependencies if provided
+      if (dependencies && typeof dependencies === 'string') {
+        const libs = dependencies.split(',').map(l => l.trim()).filter(l => l.length > 0)
+        for (const lib of libs) {
+          yield \`Installing library: \${lib}...\`
+          
+          const installChild = spawn(arduinoCliPath, [
+            'lib',
+            'install',
+            lib
+          ])
+
+          for await (const chunk of installChild.stdout) {
+            yield chunk.toString().trim()
+          }
+          for await (const chunk of installChild.stderr) {
+            yield \`[WARN] \${chunk.toString().trim()}\`
+          }
+
+          const installExitCode = await new Promise((resolve) => installChild.on('close', resolve))
+          if (installExitCode !== 0) {
+            yield \`[ERROR] Failed to install library: \${lib}\`
+            throw new Error(\`Failed to install library: \${lib}\`)
+          }
+        }
+      }
+
       yield 'Code saved. Invoking compiler...'
       // Note: arduino-cli must be in PATH. We use ~/.local/bin/arduino-cli for ubuntu VPS
       // or arduino-cli if it's globally installed.
       const buildPath = path.join(tmpDir, 'build')
-      const arduinoCliPath = process.env.NODE_ENV === 'production' 
-        ? '/home/ubuntu/.local/bin/arduino-cli'
-        : 'arduino-cli'
 
       const child = spawn(arduinoCliPath, [
         'compile',
