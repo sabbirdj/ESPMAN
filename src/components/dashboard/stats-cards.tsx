@@ -73,7 +73,7 @@ export function StatsCards() {
         return (
           <Card
             key={card.label}
-            className="relative overflow-hidden border-neutral-200 bg-white p-5 transition-all duration-200 hover:-tranneutral-y-0.5 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-950"
+            className="relative overflow-hidden border-neutral-200 bg-white p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-950"
           >
             <div className="flex items-start justify-between">
               <div className="flex flex-col">

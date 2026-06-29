@@ -44,7 +44,7 @@ export function Header({
 
       {/* Search */}
       <div className="relative hidden sm:block">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -tranneutral-y-1/2 text-neutral-400" />
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
         <Input
           value={searchValue}
           onChange={(e) => onSearchChange(e.target.value)}

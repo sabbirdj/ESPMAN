@@ -178,7 +178,7 @@ function FirmwareCard({
   }
 
   return (
-    <Card className="flex flex-col border-neutral-200 bg-white p-4 transition-all duration-200 hover:-tranneutral-y-0.5 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-950">
+    <Card className="flex flex-col border-neutral-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-950">
       <div className="flex items-start gap-3">
         <div
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white"
