@@ -23,7 +23,6 @@ export function CloudCompiler() {
   type WifiProfile = { id: string; name: string; ssid: string; password: string; host: string }
   const [profiles, setProfiles] = useState<WifiProfile[]>([])
   const [selectedProfileId, setSelectedProfileId] = useState<string>('')
-  const [selectedProfileId, setSelectedProfileId] = useState<string>('')
   const [isManageDialogOpen, setIsManageDialogOpen] = useState(false)
   const [newProfileName, setNewProfileName] = useState('')
 
