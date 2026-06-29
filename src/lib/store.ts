@@ -27,6 +27,7 @@ export interface DashboardDevice {
   wifiRssi: number | null
   uptimeSeconds: number
   gpioState: Record<string, boolean> | null
+  gpioMode: Record<string, string> | null
   lastSeenAt: string | null
   // true when a real ESP is connected over the /esp WebSocket bridge.
   // undefined/false when this device is only simulated by device-service.

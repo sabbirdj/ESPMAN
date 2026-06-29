@@ -21,6 +21,7 @@ interface DeviceShadow {
   wifiRssi: number
   uptimeSeconds: number
   gpioState: Record<string, boolean>
+  gpioMode: Record<string, string>
   lastSeenAt: string
   isReal?: boolean
 }
@@ -38,6 +39,7 @@ interface DeviceTelemetryEvent {
   uptimeSeconds: number
   lastSeenAt: string
   gpioState?: Record<string, boolean> | null
+  gpioMode?: Record<string, string> | null
 }
 
 interface InstallProgressEvent {
@@ -114,6 +116,7 @@ export function useDeviceSocket() {
           wifiRssi: s.wifiRssi,
           uptimeSeconds: s.uptimeSeconds,
           gpioState: s.gpioState,
+          gpioMode: s.gpioMode,
           lastSeenAt: s.lastSeenAt,
           isReal: s.isReal,
         }
@@ -155,13 +158,14 @@ export function useDeviceSocket() {
 
     const handleTelemetry = (event: DeviceTelemetryEvent) =>
       applyTelemetry(event.id, {
-        cpuTemp: event.cpuTemp,
-        heapUsed: event.heapUsed,
-        wifiRssi: event.wifiRssi,
+        cpuTemp: event.cpuTemp ?? undefined,
+        heapUsed: event.heapUsed ?? undefined,
+        wifiRssi: event.wifiRssi ?? undefined,
         uptimeSeconds: event.uptimeSeconds,
         lastSeenAt: event.lastSeenAt,
         status: 'online',
         ...(event.gpioState ? { gpioState: event.gpioState } : {}),
+        ...(event.gpioMode ? { gpioMode: event.gpioMode } : {}),
       })
 
     const handleInstallProgress = ({ deviceId, progress }: InstallProgressEvent) =>
@@ -224,6 +228,8 @@ export function useDeviceSocketEmitter(): DeviceEmitter {
     factoryReset: (deviceId: string) => getSocket().emit('device:factory-reset', { deviceId }),
     toggleGpio: (deviceId: string, pin: number, value: boolean) =>
       getSocket().emit('device:gpio', { deviceId, pin, value }),
+    setPinMode: (deviceId: string, pin: number, mode: string) =>
+      getSocket().emit('device:pinMode', { deviceId, pin, mode }),
     sendCommand: (deviceId: string, command: string) =>
       getSocket().emit('device:command', { deviceId, command }),
     installFirmware: (deviceId: string, firmware: { name: string; version: string; size: number; firmwareId: string }) =>
@@ -246,6 +252,7 @@ export interface DeviceEmitter {
   reboot: (deviceId: string) => void
   factoryReset: (deviceId: string) => void
   toggleGpio: (deviceId: string, pin: number, value: boolean) => void
+  setPinMode: (deviceId: string, pin: number, mode: string) => void
   sendCommand: (deviceId: string, command: string) => void
   installFirmware: (deviceId: string, firmware: { name: string; version: string; size: number; firmwareId: string }) => void
   registerDevice: (data: { id: string; name: string; type: string; macAddress: string; ipAddress?: string; firmwareVersion?: string }) => void

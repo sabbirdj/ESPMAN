@@ -38,17 +38,17 @@ function getClient(): Client {
 // ============================================================================
 export const db = {
   device: {
-    async count(where?: { status?: string; type?: string }) {
+    async count(opts?: { where?: { status?: string; type?: string } }) {
       let sql = 'SELECT COUNT(*) as cnt FROM Device'
       const args: any[] = []
       const conditions: string[] = []
-      if (where?.status) {
+      if (opts?.where?.status) {
         conditions.push('status = ?')
-        args.push(where.status)
+        args.push(opts.where.status)
       }
-      if (where?.type) {
+      if (opts?.where?.type) {
         conditions.push('type = ?')
-        args.push(where.type)
+        args.push(opts.where.type)
       }
       if (conditions.length) sql += ' WHERE ' + conditions.join(' AND ')
       const result = await getClient().execute({ sql, args })
@@ -114,7 +114,7 @@ export const db = {
       return devices
     },
 
-    async findUnique(opts: { where: { id?: string; macAddress?: string } }) {
+    async findUnique(opts: { where: { id?: string; macAddress?: string }, include?: any }) {
       let sql = 'SELECT * FROM Device'
       const args: any[] = []
       const conditions: string[] = []
@@ -123,10 +123,15 @@ export const db = {
       if (conditions.length) sql += ' WHERE ' + conditions.join(' AND ')
       sql += ' LIMIT 1'
       const result = await getClient().execute({ sql, args })
-      return (result.rows[0] as any) ?? null
+      const device = (result.rows[0] as any) ?? null
+      if (device && opts.include) {
+        const withInclude = await this.findMany({ where: { id: device.id }, include: opts.include })
+        return withInclude[0]
+      }
+      return device
     },
 
-    async findFirst(opts: { where: { version?: string; type?: string } }) {
+    async findFirst(opts: { where: { version?: string; type?: string }, include?: any }) {
       let sql = 'SELECT * FROM Device'
       const args: any[] = []
       const conditions: string[] = []
@@ -138,7 +143,7 @@ export const db = {
       return (result.rows[0] as any) ?? null
     },
 
-    async create(opts: { data: any }) {
+    async create(opts: { data: any, include?: any }) {
       const d = opts.data
       const id = d.id || 'cm' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36)
       await getClient().execute({
@@ -153,10 +158,10 @@ export const db = {
           d.uptimeSeconds ?? 0, d.gpioState ?? null, d.lastSeenAt ?? null,
         ],
       })
-      return this.findUnique({ where: { id } })
+      return this.findUnique({ where: { id }, include: opts.include })
     },
 
-    async update(opts: { where: { id: string }; data: any }) {
+    async update(opts: { where: { id: string }; data: any, include?: any }) {
       const d = opts.data
       const fields: string[] = []
       const args: any[] = []
@@ -182,7 +187,7 @@ export const db = {
         sql: `UPDATE Device SET ${fields.join(', ')} WHERE id = ?`,
         args,
       })
-      return this.findUnique({ where: { id: opts.where.id } })
+      return this.findUnique({ where: { id: opts.where.id }, include: opts.include })
     },
 
     async updateMany(opts: { where: { firmwareId?: string }; data: any }) {
@@ -203,6 +208,17 @@ export const db = {
       await getClient().execute({ sql: 'DELETE FROM Device WHERE id = ?', args: [opts.where.id] })
     },
 
+    async deleteMany(opts?: { where?: { status?: string; type?: string } }) {
+      let sql = 'DELETE FROM Device'
+      const args: any[] = []
+      const conditions: string[] = []
+      if (opts?.where?.status) { conditions.push('status = ?'); args.push(opts.where.status) }
+      if (opts?.where?.type) { conditions.push('type = ?'); args.push(opts.where.type) }
+      if (conditions.length) sql += ' WHERE ' + conditions.join(' AND ')
+      const result = await getClient().execute({ sql, args })
+      return { count: result.rowsAffected }
+    },
+
     async groupBy(opts: { by: string[]; _count: any }) {
       const by = opts.by.join(', ')
       const result = await getClient().execute({ sql: `SELECT ${by}, COUNT(*) as _count FROM Device GROUP BY ${by}` })
@@ -219,7 +235,7 @@ export const db = {
       return Number((result.rows[0] as any).cnt)
     },
 
-    async findMany(opts?: { include?: { _count?: boolean } }) {
+    async findMany(opts?: { include?: any, orderBy?: any }) {
       let sql = 'SELECT * FROM Firmware ORDER BY createdAt DESC'
       const result = await getClient().execute(sql)
       let firmwares = result.rows as any[]
@@ -240,12 +256,13 @@ export const db = {
       return (result.rows[0] as any) ?? null
     },
 
-    async findFirst(opts: { where: { version?: string; type?: string } }) {
+    async findFirst(opts: { where: any }) {
       let sql = 'SELECT * FROM Firmware'
       const args: any[] = []
       const conditions: string[] = []
       if (opts.where.version) { conditions.push('version = ?'); args.push(opts.where.version) }
       if (opts.where.type) { conditions.push('type = ?'); args.push(opts.where.type) }
+      if (opts.where.name) { conditions.push('name = ?'); args.push(opts.where.name) }
       if (conditions.length) sql += ' WHERE ' + conditions.join(' AND ')
       sql += ' LIMIT 1'
       const result = await getClient().execute({ sql, args })
@@ -282,6 +299,11 @@ export const db = {
       await getClient().execute({ sql: 'DELETE FROM Firmware WHERE id = ?', args: [opts.where.id] })
     },
 
+    async deleteMany(opts?: { where?: any }) {
+      const result = await getClient().execute({ sql: 'DELETE FROM Firmware' })
+      return { count: result.rowsAffected }
+    },
+
     async aggregate(opts: { _sum: { installCount: boolean } }) {
       const result = await getClient().execute('SELECT SUM(installCount) as cnt FROM Firmware')
       return { _sum: { installCount: (result.rows[0] as any).cnt } }
@@ -309,7 +331,7 @@ export const db = {
       return { id, ...d }
     },
 
-    async findMany(opts?: { where?: { deviceId?: string }; orderBy?: { createdAt?: 'desc' | 'asc' }; take?: number; include?: { device?: boolean } }) {
+    async findMany(opts?: { where?: { deviceId?: string }; orderBy?: { createdAt?: 'desc' | 'asc' }; take?: number; include?: any }) {
       let sql = 'SELECT * FROM TelemetryLog'
       const args: any[] = []
       if (opts?.where?.deviceId) {
@@ -332,7 +354,25 @@ export const db = {
       }
       return logs
     },
+
+    async deleteMany(opts?: { where?: { deviceId?: string } }) {
+      let sql = 'DELETE FROM TelemetryLog'
+      const args: any[] = []
+      if (opts?.where?.deviceId) {
+        sql += ' WHERE deviceId = ?'
+        args.push(opts.where.deviceId)
+      }
+      const result = await getClient().execute({ sql, args })
+      return { count: result.rowsAffected }
+    },
   },
+}
+
+export const $disconnect = async () => {
+  if (_client) {
+    _client.close()
+    _client = null
+  }
 }
 
 export { getClient as rawDbClient }

@@ -58,7 +58,8 @@
     static const int DEFAULT_PINS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
   #else
     #define CHIP_TYPE "ESP32"
-    static const int DEFAULT_PINS[] = {0, 2, 4, 5, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 25, 26, 27, 32, 33};
+    // Expanded for full control (including input-only pins 34, 35, 36, 39)
+    static const int DEFAULT_PINS[] = {0, 2, 4, 5, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 25, 26, 27, 32, 33, 34, 35, 36, 39};
   #endif
   #define ESP_RESTART     ESP.restart()
   #define ESP_FREE_HEAP   ESP.getFreeHeap()
@@ -102,6 +103,7 @@ unsigned long bootTime = millis();
 unsigned long lastWifiCheck = 0;
 bool wsConnected = false;
 bool pinState[64] = {false};
+String pinModes[64]; // Stores "INPUT", "OUTPUT", "INPUT_PULLUP"
 
 // ============================================================================
 // Setup
@@ -120,13 +122,13 @@ void setup() {
   Serial.printf("Pin count: %d\n", PIN_COUNT);
   Serial.printf("Server:    %s:%u (ws) + %u (http)\n", SERVER_HOST, SERVER_PORT, HTTP_PORT);
 
-  // Initialize all GPIO pins as OUTPUT, LOW
+  // Initialize all GPIO pins as INPUT by default (safer), except LED pins if we want
   for (int i = 0; i < PIN_COUNT; i++) {
     int pin = DEFAULT_PINS[i];
     if (pin < 64) {
-      pinMode(pin, OUTPUT);
-      digitalWrite(pin, LOW);
-      pinState[pin] = false;
+      pinMode(pin, INPUT);
+      pinModes[pin] = "INPUT";
+      pinState[pin] = digitalRead(pin);
     }
   }
 
@@ -233,10 +235,16 @@ void sendTelemetry() {
 
   // GPIO state map — ArduinoJson v7 syntax
   JsonObject gpio = doc["gpioState"].to<JsonObject>();
+  JsonObject mode = doc["gpioMode"].to<JsonObject>();
   for (int i = 0; i < PIN_COUNT; i++) {
     int pin = DEFAULT_PINS[i];
     if (pin < 64) {
+      // If it's an input, read live value
+      if (pinModes[pin] == "INPUT" || pinModes[pin] == "INPUT_PULLUP") {
+        pinState[pin] = digitalRead(pin);
+      }
       gpio[String(pin)] = pinState[pin];
+      mode[String(pin)] = pinModes[pin];
     }
   }
 
@@ -305,6 +313,10 @@ void handleServerMessage(const char* jsonStr) {
     int pin = doc["pin"] | -1;
     bool value = doc["value"] | false;
     if (pin >= 0 && pin < 64) {
+      if (pinModes[pin] != "OUTPUT") {
+        pinMode(pin, OUTPUT);
+        pinModes[pin] = "OUTPUT";
+      }
       digitalWrite(pin, value ? HIGH : LOW);
       pinState[pin] = value;
       Serial.printf("[cmd] GPIO %d -> %s\n", pin, value ? "HIGH" : "LOW");
@@ -312,6 +324,27 @@ void handleServerMessage(const char* jsonStr) {
       sendTelemetry(); // confirm new state immediately
     } else {
       sendAck("gpio", "error", "Invalid pin number");
+    }
+  }
+  else if (strcmp(cmdType, "pinMode") == 0) {
+    int pin = doc["pin"] | -1;
+    const char* mode = doc["mode"] | "INPUT";
+    if (pin >= 0 && pin < 64) {
+      if (strcmp(mode, "OUTPUT") == 0) {
+        pinMode(pin, OUTPUT);
+        pinModes[pin] = "OUTPUT";
+      } else if (strcmp(mode, "INPUT_PULLUP") == 0) {
+        pinMode(pin, INPUT_PULLUP);
+        pinModes[pin] = "INPUT_PULLUP";
+      } else {
+        pinMode(pin, INPUT);
+        pinModes[pin] = "INPUT";
+      }
+      Serial.printf("[cmd] GPIO %d mode -> %s\n", pin, mode);
+      sendAck("pinMode", "ok", String("GPIO " + String(pin) + " mode set to " + String(mode)).c_str());
+      sendTelemetry();
+    } else {
+      sendAck("pinMode", "error", "Invalid pin number");
     }
   }
   else if (strcmp(cmdType, "reboot") == 0) {
@@ -377,7 +410,7 @@ void handleSerialCommand(String command) {
     Serial.println(F("GPIO states:"));
     for (int i = 0; i < PIN_COUNT; i++) {
       int pin = DEFAULT_PINS[i];
-      Serial.printf("  GPIO %d: %s\n", pin, digitalRead(pin) ? "HIGH" : "LOW");
+      Serial.printf("  GPIO %d (%s): %s\n", pin, pinModes[pin].c_str(), digitalRead(pin) ? "HIGH" : "LOW");
     }
   } else if (command == "wifi.reconnect") {
     Serial.println(F("Reconnecting Wi-Fi..."));
@@ -386,7 +419,10 @@ void handleSerialCommand(String command) {
     connectWifi();
   } else {
     Serial.printf("[serial] unknown command: %s\n", command.c_str());
+    sendAck("command", "error", String("Unknown command: " + command).c_str());
+    return;
   }
+  sendAck("command", "ok", String("Executed: " + command).c_str());
 }
 
 // ============================================================================

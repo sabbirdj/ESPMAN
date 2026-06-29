@@ -1,7 +1,7 @@
 // Clean the database: delete the 4 fake seeded devices and their logs.
 // Run with: bun run /home/z/my-project/scripts/clean-db.ts
 
-import { db } from '../src/lib/db'
+import { db, $disconnect } from '../src/lib/db'
 
 async function main() {
   // Delete all telemetry logs first (foreign key constraint)
@@ -27,5 +27,5 @@ main()
     process.exit(1)
   })
   .finally(async () => {
-    await db.$disconnect()
+    await $disconnect()
   })

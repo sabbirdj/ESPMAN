@@ -19,6 +19,7 @@ import {
   MemoryStick,
   HardDrive,
   Usb,
+  TerminalSquare,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -45,6 +46,10 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
   const [rebooting, setRebooting] = useState(false)
   const [resetting, setResetting] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [activeTab, setActiveTab] = useState<'telemetry' | 'gpio' | 'terminal'>('telemetry')
+  
+  const logs = useDashboardStore((s) => s.logs)
+  const deviceLogs = device ? logs.filter((l) => l.deviceId === device.id) : []
 
   if (!device) return null
 
@@ -123,6 +128,13 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'gpio', payload: { pin, value: !current } }),
     }).catch(() => {})
+  }
+
+  const handleSetPinMode = (pin: number, currentMode: string) => {
+    if (!device) return
+    const modes = ['INPUT', 'OUTPUT', 'INPUT_PULLUP']
+    const nextMode = modes[(modes.indexOf(currentMode) + 1) % modes.length]
+    emitter.setPinMode(device.id, pin, nextMode)
   }
 
   const handleSendCommand = () => {
@@ -208,87 +220,219 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
             </div>
           </DialogHeader>
 
+          <div className="flex border-b border-slate-200 px-6 dark:border-slate-800">
+            <button
+              onClick={() => setActiveTab('telemetry')}
+              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'telemetry' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
+            >
+              <Signal className="h-4 w-4" /> Telemetry
+            </button>
+            <button
+              onClick={() => setActiveTab('gpio')}
+              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'gpio' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
+            >
+              <Power className="h-4 w-4" /> GPIO Control
+            </button>
+            <button
+              onClick={() => setActiveTab('terminal')}
+              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'terminal' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
+            >
+              <TerminalSquare className="h-4 w-4" /> Terminal
+            </button>
+          </div>
+
           <ScrollArea className="flex-1 px-6">
-            <div className="space-y-5 py-3">
-              {/* Identity & metadata */}
-              <section>
-                <SectionTitle icon={<Cpu className="h-3.5 w-3.5" />}>Identity</SectionTitle>
-                <div className="grid grid-cols-2 gap-3 text-xs sm:grid-cols-3">
-                  <Meta label="MAC Address" value={device.macAddress} mono />
-                  <Meta label="IP Address" value={device.ipAddress ?? '—'} mono />
-                  <Meta label="Location" value={device.location ?? '—'} />
-                  <Meta label="Chip" value={`${device.type} · ${spec?.cpu ?? ''}`} />
-                  <Meta label="Flash" value={spec?.flash ?? '—'} />
-                  <Meta label="RAM" value={spec?.ram ?? '—'} />
-                  <Meta label="Wi-Fi" value={spec?.wifi ?? '—'} />
-                  <Meta label="Bluetooth" value={spec?.bluetooth ?? '—'} />
-                  <Meta label="GPIO Pins" value={`${spec?.pins ?? '—'} total`} />
-                </div>
-                {device.description && (
-                  <div className="mt-3 rounded-lg bg-slate-50 p-3 text-xs text-slate-600 dark:bg-slate-900 dark:text-slate-400">
-                    {device.description}
-                  </div>
-                )}
-              </section>
+            <div className="space-y-5 py-5">
+              {/* Telemetry Tab */}
+              {activeTab === 'telemetry' && (
+                <>
+                  <section>
+                    <SectionTitle icon={<Cpu className="h-3.5 w-3.5" />}>Identity</SectionTitle>
+                    <div className="grid grid-cols-2 gap-3 text-xs sm:grid-cols-3">
+                      <Meta label="MAC Address" value={device.macAddress} mono />
+                      <Meta label="IP Address" value={device.ipAddress ?? '—'} mono />
+                      <Meta label="Location" value={device.location ?? '—'} />
+                      <Meta label="Chip" value={`${device.type} · ${spec?.cpu ?? ''}`} />
+                      <Meta label="Flash" value={spec?.flash ?? '—'} />
+                      <Meta label="RAM" value={spec?.ram ?? '—'} />
+                      <Meta label="Wi-Fi" value={spec?.wifi ?? '—'} />
+                      <Meta label="Bluetooth" value={spec?.bluetooth ?? '—'} />
+                      <Meta label="GPIO Pins" value={`${spec?.pins ?? '—'} total`} />
+                    </div>
+                    {device.description && (
+                      <div className="mt-3 rounded-lg bg-slate-50 p-3 text-xs text-slate-600 dark:bg-slate-900 dark:text-slate-400">
+                        {device.description}
+                      </div>
+                    )}
+                  </section>
 
-              <Separator />
+                  {!isUpdating && !isOffline && (
+                    <section>
+                      <SectionTitle icon={<Thermometer className="h-3.5 w-3.5" />}>Live Telemetry</SectionTitle>
+                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        <Metric
+                          icon={<Thermometer className="h-3.5 w-3.5" />}
+                          label="CPU Temp"
+                          value={device.cpuTemp != null ? `${device.cpuTemp.toFixed(1)}°C` : '—'}
+                          tone={tempSev === 'hot' ? 'danger' : tempSev === 'warm' ? 'warn' : 'ok'}
+                        />
+                        <Metric
+                          icon={<Signal className="h-3.5 w-3.5" />}
+                          label="Wi-Fi RSSI"
+                          value={device.wifiRssi != null ? `${device.wifiRssi} dBm` : '—'}
+                          sub={wifi?.label}
+                          tone={wifi && wifi.pct > 60 ? 'ok' : wifi && wifi.pct > 30 ? 'warn' : 'danger'}
+                        />
+                        <Metric
+                          icon={<MemoryStick className="h-3.5 w-3.5" />}
+                          label="Heap Used"
+                          value={heapPct != null ? `${heapPct}%` : '—'}
+                          sub={device.heapUsed != null && device.heapTotal ? `${formatBytes(device.heapUsed)} / ${formatBytes(device.heapTotal)}` : undefined}
+                        />
+                        <Metric
+                          icon={<Clock className="h-3.5 w-3.5" />}
+                          label="Uptime"
+                          value={device.uptimeSeconds ? formatUptime(device.uptimeSeconds) : '—'}
+                        />
+                      </div>
 
-              {/* Live telemetry */}
-              {!isUpdating && !isOffline && (
+                      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <StorageBar
+                          icon={<MemoryStick className="h-3.5 w-3.5" />}
+                          label="Heap"
+                          used={device.heapUsed}
+                          total={device.heapTotal}
+                        />
+                        <StorageBar
+                          icon={<HardDrive className="h-3.5 w-3.5" />}
+                          label="Flash"
+                          used={device.flashUsed}
+                          total={device.flashTotal}
+                        />
+                      </div>
+
+                      {device.lastSeenAt && (
+                        <p className="mt-3 text-[11px] text-slate-400 dark:text-slate-500">
+                          Last seen {new Date(device.lastSeenAt).toLocaleString()}
+                        </p>
+                      )}
+                    </section>
+                  )}
+                </>
+              )}
+
+              {/* GPIO Tab */}
+              {activeTab === 'gpio' && (
                 <section>
-                  <SectionTitle icon={<Thermometer className="h-3.5 w-3.5" />}>Live Telemetry</SectionTitle>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    <Metric
-                      icon={<Thermometer className="h-3.5 w-3.5" />}
-                      label="CPU Temp"
-                      value={device.cpuTemp != null ? `${device.cpuTemp.toFixed(1)}°C` : '—'}
-                      tone={tempSev === 'hot' ? 'danger' : tempSev === 'warm' ? 'warn' : 'ok'}
-                    />
-                    <Metric
-                      icon={<Signal className="h-3.5 w-3.5" />}
-                      label="Wi-Fi RSSI"
-                      value={device.wifiRssi != null ? `${device.wifiRssi} dBm` : '—'}
-                      sub={wifi?.label}
-                      tone={wifi && wifi.pct > 60 ? 'ok' : wifi && wifi.pct > 30 ? 'warn' : 'danger'}
-                    />
-                    <Metric
-                      icon={<MemoryStick className="h-3.5 w-3.5" />}
-                      label="Heap Used"
-                      value={heapPct != null ? `${heapPct}%` : '—'}
-                      sub={device.heapUsed != null && device.heapTotal ? `${formatBytes(device.heapUsed)} / ${formatBytes(device.heapTotal)}` : undefined}
-                    />
-                    <Metric
-                      icon={<Clock className="h-3.5 w-3.5" />}
-                      label="Uptime"
-                      value={device.uptimeSeconds ? formatUptime(device.uptimeSeconds) : '—'}
-                    />
-                  </div>
+                  <SectionTitle icon={<Power className="h-3.5 w-3.5" />}>Full GPIO Control</SectionTitle>
+                  <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
+                    Set pins to INPUT to read sensors, or OUTPUT to control relays.
+                  </p>
+                  {device.gpioState && Object.keys(device.gpioState).length > 0 ? (
+                    <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
+                      {Object.entries(device.gpioState).map(([pin, on]) => {
+                        const mode = device.gpioMode?.[pin] ?? 'INPUT'
+                        const isOutput = mode === 'OUTPUT'
+                        return (
+                          <div
+                            key={pin}
+                            className={`flex flex-col items-center gap-1.5 rounded-xl border-2 p-2.5 transition-all ${
+                              on
+                                ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40'
+                                : 'border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900'
+                            }`}
+                          >
+                            <span className="text-[10px] font-medium uppercase tracking-wide text-slate-400">GPIO {pin}</span>
+                            
+                            {/* Mode Toggle Button */}
+                            <button
+                              onClick={() => handleSetPinMode(Number(pin), mode)}
+                              disabled={isUpdating || isOffline}
+                              className="rounded bg-slate-200 px-1.5 py-0.5 text-[9px] font-bold text-slate-600 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                            >
+                              {mode}
+                            </button>
 
-                  {/* Storage bars */}
-                  <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <StorageBar
-                      icon={<MemoryStick className="h-3.5 w-3.5" />}
-                      label="Heap"
-                      used={device.heapUsed}
-                      total={device.heapTotal}
-                    />
-                    <StorageBar
-                      icon={<HardDrive className="h-3.5 w-3.5" />}
-                      label="Flash"
-                      used={device.flashUsed}
-                      total={device.flashTotal}
-                    />
-                  </div>
-
-                  {device.lastSeenAt && (
-                    <p className="mt-3 text-[11px] text-slate-400 dark:text-slate-500">
-                      Last seen {new Date(device.lastSeenAt).toLocaleString()}
-                    </p>
+                            {/* Value Toggle Button */}
+                            <button
+                              onClick={() => handleToggleGpio(Number(pin), on)}
+                              disabled={isUpdating || isOffline || !isOutput}
+                              className={`mt-1 flex w-full flex-col items-center gap-1 rounded-md py-1.5 ${!isOutput ? 'cursor-not-allowed opacity-70' : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
+                            >
+                              <span className={`text-lg font-black ${on ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}>
+                                {on ? '1' : '0'}
+                              </span>
+                              <div className={`h-1.5 w-full rounded-full ${on ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
+                            </button>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  ) : (
+                    <div className="rounded-lg border border-dashed border-slate-200 p-4 text-center text-xs text-slate-400 dark:border-slate-700">
+                      Waiting for GPIO state from ESP...
+                    </div>
                   )}
                 </section>
               )}
 
-              {isUpdating && (
+              {/* Terminal Tab */}
+              {activeTab === 'terminal' && (
+                <section className="flex h-[55vh] flex-col overflow-hidden rounded-lg border border-slate-200 bg-slate-950 shadow-inner dark:border-slate-800">
+                  <div className="flex items-center justify-between bg-slate-900 px-3 py-2 border-b border-slate-800">
+                    <span className="flex items-center gap-2 text-xs font-medium text-slate-400">
+                      <TerminalSquare className="h-4 w-4" /> Serial Monitor
+                    </span>
+                    <span className="text-[10px] text-emerald-500">Connected to /dev/ttyUSB0</span>
+                  </div>
+                  <ScrollArea className="flex-1 p-3">
+                    <div className="space-y-1.5 font-mono text-xs">
+                      {deviceLogs.slice().reverse().map((log) => (
+                        <div key={log.id} className="flex gap-3">
+                          <span className="shrink-0 text-slate-600">[{new Date(log.createdAt).toLocaleTimeString()}]</span>
+                          <span className={
+                            log.level === 'error' ? 'text-rose-400' :
+                            log.level === 'warn' ? 'text-amber-400' :
+                            log.level === 'success' ? 'text-emerald-400' :
+                            'text-slate-300'
+                          }>
+                            {log.event === 'command' ? '> ' : ''}{log.message}
+                          </span>
+                        </div>
+                      ))}
+                      {deviceLogs.length === 0 && (
+                        <div className="text-slate-600">Waiting for serial output...</div>
+                      )}
+                    </div>
+                  </ScrollArea>
+                  <div className="flex bg-slate-900 p-2 border-t border-slate-800">
+                    <div className="flex w-full items-center gap-2 rounded bg-black px-2 ring-1 ring-slate-800 focus-within:ring-emerald-500">
+                      <span className="font-mono text-emerald-500">$</span>
+                      <Input
+                        value={command}
+                        onChange={(e) => setCommand(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') handleSendCommand() }}
+                        placeholder="Type a command (e.g. sys.info)..."
+                        className="h-8 border-0 bg-transparent p-0 font-mono text-xs text-slate-200 placeholder:text-slate-600 focus-visible:ring-0"
+                        disabled={isUpdating || isOffline}
+                        autoFocus
+                      />
+                      <Button
+                        onClick={handleSendCommand}
+                        disabled={!command.trim() || isUpdating || isOffline}
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 px-2 text-emerald-500 hover:bg-emerald-950 hover:text-emerald-400"
+                      >
+                        <Send className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </section>
+              )}
+              
+              {/* Common Status messages */}
+              {isUpdating && activeTab === 'telemetry' && (
                 <section className="rounded-lg bg-amber-50 p-4 dark:bg-amber-950/30">
                   <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -300,7 +444,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                 </section>
               )}
 
-              {isOffline && (
+              {isOffline && activeTab === 'telemetry' && (
                 <section className="rounded-lg bg-slate-50 p-4 dark:bg-slate-900">
                   <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
                     <AlertTriangle className="h-4 w-4" />
@@ -313,72 +457,6 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                   </p>
                 </section>
               )}
-
-              <Separator />
-
-              {/* GPIO control */}
-              <section>
-                <SectionTitle icon={<Power className="h-3.5 w-3.5" />}>GPIO Control</SectionTitle>
-                <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
-                  Toggle individual GPIO pins to control relays, LEDs, and other peripherals attached to this device.
-                </p>
-                {device.gpioState && Object.keys(device.gpioState).length > 0 ? (
-                  <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8">
-                    {Object.entries(device.gpioState).map(([pin, on]) => (
-                      <button
-                        key={pin}
-                        onClick={() => handleToggleGpio(Number(pin), on)}
-                        disabled={isUpdating || isOffline}
-                        className={`flex flex-col items-center gap-1 rounded-lg border-2 p-2 transition-all disabled:opacity-50 ${
-                          on
-                            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40'
-                            : 'border-slate-200 bg-slate-50 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700'
-                        }`}
-                      >
-                        <span className="text-[10px] font-medium uppercase tracking-wide text-slate-400">GPIO</span>
-                        <span className="font-mono text-sm font-bold text-slate-700 dark:text-slate-300">{pin}</span>
-                        <span className={`text-[9px] font-semibold ${on ? 'text-emerald-600' : 'text-slate-400'}`}>
-                          {on ? 'HIGH' : 'LOW'}
-                        </span>
-                        <div className={`h-1.5 w-full rounded-full ${on ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="rounded-lg border border-dashed border-slate-200 p-4 text-center text-xs text-slate-400 dark:border-slate-700">
-                    Waiting for GPIO state from ESP...
-                  </div>
-                )}
-              </section>
-
-              <Separator />
-
-              {/* Serial command console */}
-              <section>
-                <SectionTitle icon={<Send className="h-3.5 w-3.5" />}>Serial Command</SectionTitle>
-                <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
-                  Send arbitrary commands to the device&apos;s serial console. Useful for debugging and one-off operations.
-                </p>
-                <div className="flex gap-2">
-                  <Input
-                    value={command}
-                    onChange={(e) => setCommand(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') handleSendCommand() }}
-                    placeholder="e.g. sys.info, wifi.scan, mqtt.status"
-                    className="font-mono text-sm"
-                    disabled={isUpdating || isOffline}
-                  />
-                  <Button
-                    onClick={handleSendCommand}
-                    disabled={!command.trim() || isUpdating || isOffline}
-                    size="sm"
-                    className="bg-emerald-600 hover:bg-emerald-700"
-                  >
-                    <Send className="h-3.5 w-3.5" />
-                    Send
-                  </Button>
-                </div>
-              </section>
             </div>
           </ScrollArea>
         </div>

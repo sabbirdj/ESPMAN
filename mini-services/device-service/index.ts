@@ -41,6 +41,7 @@ interface DeviceShadow {
   wifiRssi: number | null
   uptimeSeconds: number
   gpioState: Record<string, boolean> | null
+  gpioMode: Record<string, string> | null
   lastSeenAt: string | null
   isReal: boolean
 }
@@ -265,6 +266,16 @@ io.on('connection', (socket: Socket) => {
       broadcastLog(deviceId, 'command', `GPIO ${pin} → ${value ? 'HIGH' : 'LOW'} sent to ${dev.name}`, 'info')
     } else {
       broadcastLog(deviceId, 'error', `Cannot set GPIO on ${dev.name}: device not connected`, 'error')
+    }
+  })
+
+  socket.on('device:pinMode', ({ deviceId, pin, mode }: { deviceId: string; pin: number; mode: string }) => {
+    const dev = devices.get(deviceId)
+    if (!dev) return
+    if (sendToRealEsp(dev.macAddress, { type: 'pinMode', pin, mode })) {
+      broadcastLog(deviceId, 'command', `GPIO ${pin} mode → ${mode} sent to ${dev.name}`, 'info')
+    } else {
+      broadcastLog(deviceId, 'error', `Cannot set pinMode on ${dev.name}: device not connected`, 'error')
     }
   })
 
@@ -515,6 +526,9 @@ function handleEspTelemetry(msg: any) {
   if (msg.gpioState && typeof msg.gpioState === 'object') {
     device.gpioState = msg.gpioState as Record<string, boolean>
   }
+  if (msg.gpioMode && typeof msg.gpioMode === 'object') {
+    device.gpioMode = msg.gpioMode as Record<string, string>
+  }
   device.lastSeenAt = new Date().toISOString()
 
   // Push to dashboards — send a single comprehensive update that includes
@@ -527,6 +541,7 @@ function handleEspTelemetry(msg: any) {
     uptimeSeconds: device.uptimeSeconds,
     lastSeenAt: device.lastSeenAt,
     gpioState: device.gpioState,
+    gpioMode: device.gpioMode,
   })
 }
 
@@ -594,6 +609,7 @@ async function loadExistingDevicesFromDb() {
           wifiRssi: null,
           uptimeSeconds: 0,
           gpioState: null,
+          gpioMode: null,
           lastSeenAt: null,
           isReal: false,
         }

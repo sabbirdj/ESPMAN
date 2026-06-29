@@ -51,7 +51,9 @@ export function FirmwareManager() {
   }
 
   useEffect(() => {
-    loadFirmware()
+    setTimeout(() => {
+      loadFirmware()
+    }, 0)
   }, [])
 
   return (
