@@ -154,7 +154,6 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
       <DialogContent className="flex max-h-[90dvh] flex-col overflow-hidden p-0 sm:max-w-[780px]">
         {/* Header banner */}
         <div
-        <div
           className="h-2 w-full shrink-0"
           style={{ backgroundColor: spec?.color ?? '#64748b' }}
         />
