@@ -118,29 +118,28 @@ void loop() {
       }
 
       // 5. Save generated bin and register firmware
-      yield 'Compilation successful! Saving firmware...'
       const binFile = path.join(buildPath, `${path.basename(tmpDir)}.ino.bin`)
-      const destDir = path.join(process.cwd(), 'firmware-bins')
-      await fs.mkdir(destDir, { recursive: true })
-      
-      const fileName = `${name}_${version}_${chipType}.bin`.replace(/\s+/g, '_')
-      const destPath = path.join(destDir, fileName)
-      await fs.copyFile(binFile, destPath)
-      
-      const stat = await fs.stat(destPath)
-      
-      // Register in DB
+      const stat = await fs.stat(binFile)
+
+      // Register in DB first to get the ID
       yield 'Registering firmware in database...'
-      await db.firmware.create({
+      const firmware = await db.firmware.create({
         data: {
           name,
           version,
-          targetChip: chipType.toLowerCase(),
-          fileSize: stat.size,
-          filePath: `/firmware-bins/${fileName}`,
+          type: chipType,
+          size: stat.size,
           checksum: 'auto-generated',
         }
       })
+
+      // Save generated bin with the ID as filename (so OTA works)
+      yield 'Compilation successful! Saving firmware...'
+      const destDir = path.join(process.cwd(), 'firmware-bins')
+      await fs.mkdir(destDir, { recursive: true })
+      
+      const destPath = path.join(destDir, `${firmware.id}.bin`)
+      await fs.copyFile(binFile, destPath)
 
     } finally {
       // Cleanup temp directory
