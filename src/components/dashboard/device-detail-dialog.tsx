@@ -157,7 +157,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
           className="h-2 w-full shrink-0"
           style={{ backgroundColor: spec?.color ?? '#64748b' }}
         />
-        <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex flex-1 flex-col overflow-hidden min-h-0">
           <DialogHeader className="px-6 pb-2 pt-4">
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-start gap-3">
@@ -241,7 +241,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
             </button>
           </div>
 
-          <ScrollArea className="flex-1 px-6">
+          <ScrollArea className="flex-1 px-6 min-h-0">
             <div className="space-y-5 py-5">
               {/* Telemetry Tab */}
               {activeTab === 'telemetry' && (
