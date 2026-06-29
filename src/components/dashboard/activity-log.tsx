@@ -53,7 +53,7 @@ export function ActivityLog({ height = 'h-[420px]' }: { height?: string }) {
   }, [prependLogs])
 
   return (
-    <Card className="flex flex-col border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+    <Card className={`flex flex-col border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 ${height}`}>
       <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 dark:border-slate-800">
         <div className="flex items-center gap-2">
           <Activity className="h-4 w-4 text-emerald-500" />
@@ -63,7 +63,7 @@ export function ActivityLog({ height = 'h-[420px]' }: { height?: string }) {
           {logs.length} events
         </span>
       </div>
-      <div className={`flex-1 overflow-y-auto ${height}`}>
+      <div className="flex-1 overflow-y-auto">
         <div className="divide-y divide-slate-50 dark:divide-slate-900">
           {loading && logs.length === 0 ? (
             <div className="p-6 text-center text-xs text-slate-400">Loading activity log…</div>
