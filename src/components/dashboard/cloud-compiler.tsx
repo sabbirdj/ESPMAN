@@ -18,12 +18,6 @@ export function CloudCompiler() {
   const [wifiPassword, setWifiPassword] = useState('')
   const [serverHost, setServerHost] = useState('13.62.213.148')
 
-  type WifiProfile = { id: string; name: string; ssid: string; password: string; host: string }
-  const [profiles, setProfiles] = useState<WifiProfile[]>([])
-  const [selectedProfileId, setSelectedProfileId] = useState<string>('')
-  const [isSavingProfile, setIsSavingProfile] = useState(false)
-  const [newProfileName, setNewProfileName] = useState('')
-
   const [isCompiling, setIsCompiling] = useState(false)
   const [logs, setLogs] = useState<string[]>([])
   const terminalRef = useRef<HTMLDivElement>(null)
@@ -34,11 +28,6 @@ export function CloudCompiler() {
       .then(res => res.text())
       .then(text => setCode(text))
       .catch(() => setCode('// Failed to load template'))
-      
-    try {
-      const saved = localStorage.getItem('espman_wifi_profiles')
-      if (saved) setProfiles(JSON.parse(saved))
-    } catch(e) {}
   }, [])
 
   // Auto-scroll terminal
@@ -47,40 +36,6 @@ export function CloudCompiler() {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight
     }
   }, [logs])
-
-  const handleSaveProfile = () => {
-    if (!newProfileName.trim()) {
-      toast.error('Profile name is required')
-      return
-    }
-    
-    const newProfile: WifiProfile = {
-      id: Date.now().toString(),
-      name: newProfileName.trim(),
-      ssid: wifiSsid,
-      password: wifiPassword,
-      host: serverHost
-    }
-    
-    const updated = [...profiles, newProfile]
-    setProfiles(updated)
-    setSelectedProfileId(newProfile.id)
-    localStorage.setItem('espman_wifi_profiles', JSON.stringify(updated))
-    toast.success('Wi-Fi profile saved')
-    setIsSavingProfile(false)
-    setNewProfileName('')
-  }
-
-  const handleProfileSelect = (id: string) => {
-    setSelectedProfileId(id)
-    if (id === '') return
-    const p = profiles.find(x => x.id === id)
-    if (p) {
-      setWifiSsid(p.ssid)
-      setWifiPassword(p.password)
-      setServerHost(p.host)
-    }
-  }
 
   const handleCompile = async () => {
     if (!name || !version) {
@@ -246,52 +201,12 @@ export function CloudCompiler() {
               </div>
 
               <div className="pt-2">
-                <div className="flex items-center justify-between mb-3 border-b border-slate-200 dark:border-slate-800 pb-2">
-                  <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
-                    <Wifi className="h-4 w-4" />
-                    Hardware Config
-                  </div>
-                  {!isSavingProfile && (
-                    <button onClick={() => setIsSavingProfile(true)} className="text-[10px] text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 font-medium">
-                      + Save Profile
-                    </button>
-                  )}
+                <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800 pb-2 mb-3">
+                  <Wifi className="h-4 w-4" />
+                  Hardware Config
                 </div>
 
-                {isSavingProfile && (
-                  <div className="mb-3 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-md border border-slate-200 dark:border-slate-800 flex flex-col gap-2">
-                    <label className="text-xs font-medium text-slate-500">Profile Name</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. Home, Office"
-                      value={newProfileName}
-                      onChange={e => setNewProfileName(e.target.value)}
-                      className="w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
-                    />
-                    <div className="flex gap-2 justify-end mt-1">
-                      <button onClick={() => setIsSavingProfile(false)} className="text-xs text-slate-500 hover:text-slate-700">Cancel</button>
-                      <button onClick={handleSaveProfile} className="text-xs text-emerald-600 font-medium hover:text-emerald-700">Save</button>
-                    </div>
-                  </div>
-                )}
-
                 <div className="space-y-3">
-                  {profiles.length > 0 && (
-                    <div>
-                      <label className="text-xs font-medium text-slate-500">Saved Profiles</label>
-                      <select
-                        value={selectedProfileId}
-                        onChange={(e) => handleProfileSelect(e.target.value)}
-                        className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
-                      >
-                        <option value="">-- Custom (No Profile) --</option>
-                        {profiles.map(p => (
-                          <option key={p.id} value={p.id}>{p.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-                  
                   <div>
                     <label className="text-xs font-medium text-slate-500">Wi-Fi SSID</label>
                     <input
