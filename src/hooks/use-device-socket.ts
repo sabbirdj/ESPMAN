@@ -54,7 +54,11 @@ let _connectPromise: Promise<Socket> | null = null
 
 function getSocket(): Socket {
   if (_socket) return _socket
-  _socket = io('/?XTransformPort=3003', {
+  
+  // Use the current browser hostname, but connect to the device-service port (3003)
+  const url = typeof window !== 'undefined' ? `http://${window.location.hostname}:3003` : 'http://localhost:3003'
+  
+  _socket = io(url, {
     transports: ['websocket', 'polling'],
     forceNew: true,
     reconnection: true,
