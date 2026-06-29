@@ -1,5 +1,6 @@
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
+import colors from "tailwindcss/colors";
 
 const config: Config = {
     darkMode: "class",
@@ -11,6 +12,7 @@ const config: Config = {
   theme: {
   	extend: {
   		colors: {
+        slate: colors.neutral,
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {

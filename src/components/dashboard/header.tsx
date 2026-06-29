@@ -1,6 +1,6 @@
 'use client'
 
-import { Activity, Bell, Moon, Plus, Search, Sun } from 'lucide-react'
+import { Activity, Bell, Moon, Plus, Search, Sun, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useDashboardStore } from '@/lib/store'
@@ -14,6 +14,7 @@ interface HeaderProps {
   onSearchChange: (value: string) => void
   onAddDevice?: () => void
   showAddButton?: boolean
+  onReload?: () => void
 }
 
 export function Header({
@@ -23,6 +24,7 @@ export function Header({
   onSearchChange,
   onAddDevice,
   showAddButton = true,
+  onReload,
 }: HeaderProps) {
   const devices = useDashboardStore((s) => s.devices)
   const onlineCount = devices.filter((d) => d.status === 'online').length
@@ -75,6 +77,20 @@ export function Header({
           )}
         </Button>
       )}
+
+      {/* Reload button */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => {
+          if (onReload) onReload()
+          else window.location.reload()
+        }}
+        className="transition-all duration-200"
+        title="Reload data"
+      >
+        <RefreshCw className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+      </Button>
 
       <Button variant="ghost" size="icon" className="relative">
         <Bell className="h-4 w-4" />

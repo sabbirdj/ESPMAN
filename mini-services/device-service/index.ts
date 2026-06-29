@@ -654,6 +654,34 @@ async function loadExistingDevicesFromDb() {
 // Give the Next.js API a moment to be ready, then load existing devices.
 setTimeout(loadExistingDevicesFromDb, 2000)
 
+// Heartbeat interval to detect silently dropped connections
+setInterval(() => {
+  const now = Date.now()
+  devices.forEach((dev) => {
+    if (dev.status === 'online' && dev.lastSeenAt) {
+      const lastSeen = new Date(dev.lastSeenAt).getTime()
+      // If no telemetry for 15 seconds, assume disconnected
+      if (now - lastSeen > 15000) {
+        dev.status = 'offline'
+        dev.isReal = false
+        broadcast('device:update', { id: dev.id, changes: { status: 'offline', isReal: false } })
+        broadcastLog(dev.id, 'offline', `${dev.name} timed out (no telemetry for 15s)`, 'warn')
+        updateDeviceStatusInApi(dev.id, 'offline')
+        console.log(`[esp-bridge] Device timed out: ${dev.macAddress} (${dev.name})`)
+        
+        // Clean up any lingering websocket
+        for (const [mac, socket] of realEsps.entries()) {
+           if (mac === dev.macAddress.toUpperCase()) {
+             socket.terminate()
+             realEsps.delete(mac)
+             break
+           }
+        }
+      }
+    }
+  })
+}, 5000)
+
 process.on('SIGTERM', () => {
   httpServer.close(() => process.exit(0))
   espHttpServer.close(() => process.exit(0))

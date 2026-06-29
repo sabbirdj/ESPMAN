@@ -151,13 +151,14 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
 
   return (
     <Dialog open={!!device} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-hidden p-0 sm:max-w-[780px]">
+      <DialogContent className="flex max-h-[90dvh] flex-col overflow-hidden p-0 sm:max-w-[780px]">
         {/* Header banner */}
         <div
-          className="h-2 w-full"
-          style={{ backgroundColor: spec?.color ?? '#10b981' }}
+        <div
+          className="h-2 w-full shrink-0"
+          style={{ backgroundColor: spec?.color ?? '#64748b' }}
         />
-        <div className="flex max-h-[88vh] flex-col overflow-hidden">
+        <div className="flex flex-1 flex-col overflow-hidden">
           <DialogHeader className="px-6 pb-2 pt-4">
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-start gap-3">
@@ -174,7 +175,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                       {device.type}
                     </Badge>
                     {device.isReal && (
-                      <Badge variant="outline" className="gap-1 text-[10px] border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+                      <Badge variant="outline" className="gap-1 text-[10px] border-slate-300 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">
                         <Usb className="h-2.5 w-2.5" />
                         ESP connected
                       </Badge>
@@ -202,7 +203,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                   size="sm"
                   onClick={handleFactoryReset}
                   disabled={resetting || isUpdating}
-                  className="h-8 text-amber-700 hover:bg-amber-50 hover:text-amber-800"
+                  className="h-8 text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                 >
                   {resetting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCcw className="h-3.5 w-3.5" />}
                   Reset
@@ -212,7 +213,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                   size="icon"
                   onClick={handleDelete}
                   disabled={deleting}
-                  className="h-8 w-8 text-rose-500 hover:bg-rose-50 hover:text-rose-600"
+                  className="h-8 w-8 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                 >
                   {deleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                 </Button>
@@ -223,19 +224,19 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
           <div className="flex border-b border-slate-200 px-6 dark:border-slate-800">
             <button
               onClick={() => setActiveTab('telemetry')}
-              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'telemetry' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
+              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'telemetry' ? 'border-slate-900 text-slate-900 dark:border-slate-100 dark:text-slate-100' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
             >
               <Signal className="h-4 w-4" /> Telemetry
             </button>
             <button
               onClick={() => setActiveTab('gpio')}
-              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'gpio' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
+              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'gpio' ? 'border-slate-900 text-slate-900 dark:border-slate-100 dark:text-slate-100' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
             >
               <Power className="h-4 w-4" /> GPIO Control
             </button>
             <button
               onClick={() => setActiveTab('terminal')}
-              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'terminal' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
+              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'terminal' ? 'border-slate-900 text-slate-900 dark:border-slate-100 dark:text-slate-100' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
             >
               <TerminalSquare className="h-4 w-4" /> Terminal
             </button>
@@ -338,7 +339,7 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                             key={pin}
                             className={`flex flex-col items-center gap-1.5 rounded-xl border-2 p-2.5 transition-all ${
                               on
-                                ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40'
+                                ? 'border-slate-900 bg-slate-100 dark:border-slate-200 dark:bg-slate-800'
                                 : 'border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900'
                             }`}
                           >
@@ -359,10 +360,10 @@ export function DeviceDetailDialog({ device, onOpenChange, onDeviceRemoved }: De
                               disabled={isUpdating || isOffline || !isOutput}
                               className={`mt-1 flex w-full flex-col items-center gap-1 rounded-md py-1.5 ${!isOutput ? 'cursor-not-allowed opacity-70' : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
                             >
-                              <span className={`text-lg font-black ${on ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}>
+                              <span className={`text-lg font-black ${on ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500'}`}>
                                 {on ? '1' : '0'}
                               </span>
-                              <div className={`h-1.5 w-full rounded-full ${on ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
+                              <div className={`h-1.5 w-full rounded-full ${on ? 'bg-slate-900 dark:bg-slate-100' : 'bg-slate-200 dark:bg-slate-700'}`} />
                             </button>
                           </div>
                         )
