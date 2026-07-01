@@ -94,8 +94,8 @@ From your local machine (or wherever you have the project code):
 export DATABASE_URL="libsql://esp-manager-<your-org>.turso.io"
 export TURSO_AUTH_TOKEN="eyJhbGciOi..."
 
-# Push the Prisma schema to Turso
-bun run db:push
+# Push the Prisma schema to Turso using the custom script
+bun run db:push:turso
 
 # Seed the firmware library (does NOT create fake devices)
 curl -X POST http://localhost:3000/api/seed

@@ -1,16 +1,30 @@
 // Push the Prisma schema SQL to Turso using the libSQL client.
-// Run with: bun run /home/z/my-project/scripts/push-turso-schema.ts
+// Run with: bun run scripts/push-turso-schema.ts
 
 import { createClient } from '@libsql/client'
-import { readFileSync } from 'fs'
+import { execSync } from 'child_process'
+import { readFileSync, unlinkSync } from 'fs'
 
-const url = 'libsql://esp-device-manger-xeroxviper.aws-ap-south-1.turso.io'
-const authToken = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODI3MTMyOTYsImlkIjoiMDE5ZjExZmUtMTEwMS03MDkzLThiZDktMmVkNTI5MTgxOGZlIiwicmlkIjoiYjg0NmRmMzMtNWNmNy00M2IwLThiMzMtNmE4ODM1M2RlMzBhIn0.VTJpXubj33sauQigzB67Q5Km1g1uV5s-5yQb6Jk7LyrknqyrjQNtZtwvqN-L7AUQdkM14oxq6nJzXJiJYEP0Bg'
+const url = process.env.DATABASE_URL
+const authToken = process.env.TURSO_AUTH_TOKEN
+
+if (!url || !url.startsWith('libsql://')) {
+  console.error('[push-turso] DATABASE_URL must start with libsql://')
+  process.exit(1)
+}
+
+if (!authToken) {
+  console.error('[push-turso] TURSO_AUTH_TOKEN is missing')
+  process.exit(1)
+}
+
+console.log('[push-turso] Generating schema SQL...')
+const sqlPath = './db_init.sql'
+execSync(`bunx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > ${sqlPath}`)
 
 const client = createClient({ url, authToken })
 
 // Read the SQL file
-const sqlPath = '/tmp/schema.sql'
 const sql = readFileSync(sqlPath, 'utf-8')
 console.log(`[push-turso] read ${sql.length} bytes from ${sqlPath}`)
 
@@ -19,6 +33,8 @@ const statements = sql
   .split(/;\s*\n/)
   .map((s) => s.trim())
   .filter((s) => s.length > 0)
+
+unlinkSync(sqlPath)
 
 console.log(`[push-turso] found ${statements.length} SQL statements`)
 
