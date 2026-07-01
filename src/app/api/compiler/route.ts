@@ -31,9 +31,9 @@ function streamResponse(iterator: AsyncGenerator<string>) {
 }
 
 export async function POST(req: Request) {
-  const { code, name, version, chipType, wifiSsid, wifiPassword, serverHost, dependencies } = await req.json()
+  const { files, name, version, chipType, wifiSsid, wifiPassword, serverHost, dependencies } = await req.json()
 
-  if (!code || !name || !version || !chipType) {
+  if (!files || !Array.isArray(files) || files.length === 0 || !name || !version || !chipType) {
     return NextResponse.json({ error: 'Missing parameters' }, { status: 400 })
   }
 
@@ -68,21 +68,37 @@ export async function POST(req: Request) {
 `
       await fs.writeFile(path.join(tmpDir, 'espman_config.h'), configHeader)
 
-      // 1. Process user code directly
+      // Process user files
       yield 'Processing firmware code...'
       
-      let finalCode = code
+      const sketchFileName = `${path.basename(tmpDir)}.ino`
       
-      // Smart Injection: If user didn't include the library manually, inject it
-      if (!code.includes('ESPMAN.h')) {
-        yield 'Auto-injecting ESPMAN framework...'
-        
-        // Rename user's setup and loop
-        let userCode = code
-        userCode = userCode.replace(/\bvoid\s+setup\s*\(\s*\)/g, 'void user_setup()')
-        userCode = userCode.replace(/\bvoid\s+loop\s*\(\s*\)/g, 'void user_loop()')
-        
-        finalCode = `
+      // Find the main .ino file (either named main.ino, or the first .ino file we find)
+      let mainInoIndex = files.findIndex((f: any) => f.name === 'main.ino')
+      if (mainInoIndex === -1) {
+        mainInoIndex = files.findIndex((f: any) => f.name.endsWith('.ino'))
+      }
+      
+      if (mainInoIndex === -1) {
+        throw new Error('No .ino file found in the project files')
+      }
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        let finalContent = file.content
+        let finalName = file.name
+
+        // Smart Injection only on the main .ino file
+        if (i === mainInoIndex) {
+          finalName = sketchFileName // The main ino must match the folder name for arduino-cli
+          if (!finalContent.includes('ESPMAN.h')) {
+            yield 'Auto-injecting ESPMAN framework...'
+            
+            let userCode = finalContent
+            userCode = userCode.replace(/\bvoid\s+setup\s*\(\s*\)/g, 'void user_setup()')
+            userCode = userCode.replace(/\bvoid\s+loop\s*\(\s*\)/g, 'void user_loop()')
+            
+            finalContent = `
 #include "ESPMAN.h"
 ESPManager espman_auto_manager;
 
@@ -104,11 +120,13 @@ void loop() {
   user_loop();
 }
 `
+          }
+        }
+        
+        await fs.writeFile(path.join(tmpDir, finalName), finalContent)
       }
-
-      // Write user code to temp dir
-      const sketchFile = path.join(tmpDir, `${path.basename(tmpDir)}.ino`)
-      await fs.writeFile(sketchFile, finalCode)
+      
+      const sketchFile = path.join(tmpDir, sketchFileName)
       
       // 2. Copy ESPMAN library into sketch folder
       yield 'Injecting ESPMAN Library...'

@@ -10,7 +10,10 @@ import { Button } from '@/components/ui/button'
 import { useRouter } from 'navigation'
 
 export function CloudCompiler() {
-  const [code, setCode] = useState<string>('// Loading ESPMAN firmware template...')
+  type CompilerFile = { name: string; content: string }
+  const [files, setFiles] = useState<CompilerFile[]>([{ name: 'main.ino', content: '// Loading ESPMAN firmware template...' }])
+  const [activeFileIndex, setActiveFileIndex] = useState(0)
+  
   const [name, setName] = useState('MyCustomFirmware')
   const [version, setVersion] = useState('1.0.0')
   const [chipType, setChipType] = useState('ESP32')
@@ -37,8 +40,8 @@ export function CloudCompiler() {
   useEffect(() => {
     fetch('/api/compiler/template')
       .then(res => res.text())
-      .then(text => setCode(text))
-      .catch(() => setCode('// Failed to load template'))
+      .then(text => setFiles([{ name: 'main.ino', content: text }]))
+      .catch(() => setFiles([{ name: 'main.ino', content: '// Failed to load template' }]))
       
     try {
       const saved = localStorage.getItem('espman_wifi_profiles')
@@ -113,7 +116,7 @@ export function CloudCompiler() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          code, 
+          files, 
           name, 
           version, 
           chipType,
@@ -168,22 +171,102 @@ export function CloudCompiler() {
       {/* Editor Section */}
       <div className="flex flex-col gap-4 lg:col-span-2">
         <Card className="flex flex-col overflow-hidden border-neutral-200 dark:border-neutral-800">
-          <div className="flex items-center justify-between border-b border-neutral-200 bg-neutral-50 px-4 py-3 dark:border-neutral-800 dark:bg-neutral-900/50">
-            <div className="flex items-center gap-2 text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              <Code className="h-4 w-4" />
-              Arduino Editor
+          <div className="flex flex-col border-b border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900/50">
+            <div className="flex items-center justify-between px-4 py-3">
+              <div className="flex items-center gap-2 text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                <Code className="h-4 w-4" />
+                Arduino Editor
+              </div>
+              <div className="text-xs text-neutral-500">
+                ESPMAN framework is automatically injected into your main .ino file
+              </div>
             </div>
-            <div className="text-xs text-neutral-500">
-              ESPMAN framework is automatically injected during compilation
+            
+            {/* File Tabs */}
+            <div className="flex items-center gap-1 overflow-x-auto px-2 pb-2">
+              {files.map((file, i) => (
+                <div 
+                  key={i} 
+                  onClick={() => setActiveFileIndex(i)} 
+                  className={`group flex items-center gap-2 cursor-pointer px-3 py-1.5 text-xs rounded-md border ${
+                    i === activeFileIndex 
+                      ? 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 shadow-sm text-neutral-900 dark:text-neutral-100 font-medium' 
+                      : 'border-transparent text-neutral-500 hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 hover:text-neutral-700 dark:hover:text-neutral-300'
+                  }`}
+                >
+                  {file.name}
+                  {files.length > 1 && (
+                    <button 
+                      onClick={(e) => { 
+                        e.stopPropagation()
+                        const newFiles = files.filter((_, idx) => idx !== i)
+                        setFiles(newFiles)
+                        if (activeFileIndex >= i) setActiveFileIndex(Math.max(0, activeFileIndex - 1))
+                      }} 
+                      className={`text-neutral-400 hover:text-red-500 ${i === activeFileIndex ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  )}
+                </div>
+              ))}
+              <div className="flex items-center gap-1 ml-1 border-l border-neutral-200 dark:border-neutral-700 pl-2">
+                <button 
+                  onClick={() => {
+                    const fname = prompt("Enter file name (e.g. helper.h or sensors.cpp)")
+                    if (fname && fname.trim()) {
+                      const newFiles = [...files, {name: fname.trim(), content: ''}]
+                      setFiles(newFiles)
+                      setActiveFileIndex(newFiles.length - 1)
+                    }
+                  }} 
+                  className="flex items-center gap-1 px-2 py-1.5 text-xs rounded text-neutral-500 hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
+                  title="Add new file"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  New File
+                </button>
+                <label className="flex items-center gap-1 px-2 py-1.5 text-xs rounded cursor-pointer text-neutral-500 hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors" title="Upload local files">
+                  <Save className="h-3.5 w-3.5" />
+                  Upload
+                  <input type="file" multiple className="hidden" onChange={async (e) => {
+                    const uploadedFiles = Array.from(e.target.files || [])
+                    if (!uploadedFiles.length) return
+                    const newFiles = await Promise.all(uploadedFiles.map(async f => ({
+                      name: f.name,
+                      content: await f.text()
+                    })))
+                    
+                    let merged = [...files]
+                    if (merged.length === 1 && merged[0].name === 'main.ino' && merged[0].content.includes('// Loading ESPMAN')) {
+                      merged = [] // Clear template if uploading custom files
+                    }
+                    
+                    for (const nf of newFiles) {
+                      const existingIdx = merged.findIndex(x => x.name === nf.name)
+                      if (existingIdx >= 0) merged[existingIdx] = nf
+                      else merged.push(nf)
+                    }
+                    
+                    setFiles(merged)
+                    setActiveFileIndex(0)
+                    e.target.value = '' // reset input
+                  }} />
+                </label>
+              </div>
             </div>
           </div>
           <div className="h-[500px] w-full">
             <Editor
               height="100%"
-              defaultLanguage="cpp"
+              defaultLanguage={files[activeFileIndex]?.name.endsWith('.cpp') || files[activeFileIndex]?.name.endsWith('.ino') ? 'cpp' : 'c'}
               theme="vs-dark"
-              value={code}
-              onChange={(value) => setCode(value || '')}
+              value={files[activeFileIndex]?.content || ''}
+              onChange={(value) => {
+                const newFiles = [...files]
+                newFiles[activeFileIndex].content = value || ''
+                setFiles(newFiles)
+              }}
               options={{
                 minimap: { enabled: false },
                 fontSize: 14,
@@ -451,9 +534,9 @@ export function CloudCompiler() {
             <div className="mt-4 rounded-md bg-neutral-100 p-3 text-xs text-neutral-800 dark:bg-neutral-800/30 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700">
               <p className="font-semibold mb-1">How it works:</p>
               <ul className="list-disc pl-4 space-y-1">
-                <li>Paste any standard Arduino sketch.</li>
+                <li>Create multiple files using tabs or upload them directly.</li>
                 <li>Set your custom config (Wi-Fi, Server) in the Settings panel.</li>
-                <li>ESPMAN framework is automatically injected without duplicate code errors.</li>
+                <li>ESPMAN framework is automatically injected into your main .ino file.</li>
                 <li>Deploy to any device instantly via OTA!</li>
               </ul>
             </div>
